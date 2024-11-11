@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  @apply p-0 m-0;
+  /* @apply w-full h-full;
+  @apply app-layout; */
+  box-sizing: border-box;
+}
+
+html,
+body {
+  /* @apply bg-slate-100; */
+  /* background-color: #23272f; */
+  /* background-color: #0f172a; */
+  @apply app-layout h-[100vh] overflow-hidden;
+}
+
+@layer components {
+  /* Base layout */
+  .app-layout {
+    @apply bg-gray-100 dark:bg-gray-900;
+    /* @apply min-h-screen bg-white dark:bg-[#121C23]; */
+  }
+
+  /* Card component */
+  .app-card {
+    /* @apply bg-white dark:bg-gray-800; */
+    @apply bg-white dark:bg-[#0E171E];
+  }
+
+  /* Sidebar component */
+  .app-sidebar {
+    /* @apply w-64 bg-gray-50 dark:bg-gray-800; */
+    /* @apply bg-white dark:bg-[#0E171E]; */
+    /* @apply bg-white dark:bg-gray-950; */
+    @apply bg-white dark:bg-gray-900;
+  }
+
+  /* Header component */
+  .app-header {
+    @apply bg-[#0E171E];
+  }
+
+  /* Navigation items */
+  .nav-item {
+    @apply px-4 py-2 rounded-lg
+           text-gray-700 dark:text-gray-200
+           hover:bg-gray-100 dark:hover:bg-gray-700
+           cursor-pointer;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply px-4 py-2 rounded-lg
+           bg-blue-500 hover:bg-blue-600
+           dark:bg-blue-600 dark:hover:bg-blue-700
+           text-white;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 rounded-lg
+           bg-gray-200 hover:bg-gray-300
+           dark:bg-gray-700 dark:hover:bg-gray-600
+           text-gray-700 dark:text-gray-200;
+  }
+
+  /* Text styles */
+  .text-heading {
+    @apply text-gray-900 dark:text-white font-bold;
+  }
+
+  .text-body {
+    @apply text-gray-700 dark:text-gray-200;
+  }
+
+  .text-muted {
+    @apply text-gray-500 dark:text-gray-400;
+  }
+}
