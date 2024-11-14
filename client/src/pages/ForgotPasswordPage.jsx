@@ -121,7 +121,7 @@ const ForgotPasswordPage = ({ userType }) => {
     <>
       <Header />
       <main className="h-[80vh] flex justify-center items-center">
-        <Card className="w-[95%] md:w-1/2 mx-auto" isBlurred>
+        <Card className="w-[95%] md:w-2/3 lg:w-1/2 mx-auto mt-8" isBlurred>
           <CardHeader className="flex-col justify-center pt-10 px-20 gap-4 text-center">
             <h1 className="text-4xl">Forgot Password</h1>
             {uiElements.loading && (
@@ -142,7 +142,7 @@ const ForgotPasswordPage = ({ userType }) => {
             {tokenState.tokenMsg && <h3 className="text-lg">{tokenState.tokenMsg}</h3>}{" "}
           </CardHeader>
           {!tokenState.tokenSent ? (
-            <Form onSubmit={getTokenMail}>
+            <Form onSubmit={getTokenMail} className="flex flex-col gap-4 my-2">
               <CardBody className="px-20 gap-3 justify-center">
                 <Input
                   type="email"

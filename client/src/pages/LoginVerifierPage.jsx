@@ -8,7 +8,7 @@ import { useRedirectIfAuthenticated } from "../hooks/checkAuthHooks";
 import LoginFormUser from "../components/LoginFormUser";
 import LoginFormOrganization from "../components/LoginFormOrganization";
 
-const LoginPage = () => {
+const LoginVerifierPage = () => {
   //   const navigate = useNavigate();
   //   const dispatch = useDispatch();
 
@@ -32,10 +32,6 @@ const LoginPage = () => {
     }, seconds * 1000);
     return timeout;
   };
-
-  // const toggleSelectedForm = () => {
-  //   setSelectedForm((prev) => (prev === "User" ? "Organization" : "User"));
-  // };
 
   useEffect(() => {
     if (uiElements.message || uiElements.error) {
@@ -115,4 +111,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default LoginVerifierPage;

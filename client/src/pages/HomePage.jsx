@@ -8,37 +8,30 @@ import Content from "../components/Content";
 import { Card, CardHeader, CardBody, Button, CardFooter, Chip } from "@nextui-org/react";
 import { ScrollShadow } from "@nextui-org/scroll-shadow";
 import { useSelector, useDispatch } from "react-redux";
-// import usePopulateNotes from "../hooks/notesHooks";
+// import usePopulateDocuments from "../hooks/usePopulateDocuments";
 // import { useRedirectIfNotAuthenticated } from "../hooks/checkAuthHooks";
-import { authActions, notesActions } from "../store";
+import { authActions, documentsActions } from "../store";
 // import CloseIcon from "../assets/close.png";
 
 const HomePage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const notesState = useSelector((state) => state.notes);
+  const documentsState = useSelector((state) => state.documents);
   const [isDeleting, setIsDeleting] = useState(false);
-  console.log("Notes-state: ", notesState);
 
-  const { notes, selectedTags } = notesState;
-  // const selectedTags = window.localStorage.getItem("selectedTags").split(",");
-  let notesToDisplay = [];
-  if (selectedTags?.length == 0) notesToDisplay = [...notes];
-  else
-    notesToDisplay = notes.filter((note) => note.tags.some((tag) => selectedTags?.includes(tag)));
-  // console.log(notesToDisplay);
+  console.log("Notes-state: ", documentsState);
 
-  const handleViewNote = async (id) => {
-    // const response = await fetch(`http://localhost:3000/api/notes/${id}`, {
-    //   credentials: "include",
-    // });
-    // const data = await response.json();
-    // console.log(data);
-    // navigate(`/notes/${id}`, { state: { note: notes.find((note) => note._id === id) } });
-    navigate(`/notes/${id}`);
+  const { documents } = documentsState;
+  const handleViewDoc = async (id) => {
+    // window.location.href = `http://localhost:3000/api/documents/${id}`;  // Opens in same tab
+    // window.location.assign(`http://localhost:3000/api/documents/${id}`); // Opens in same tab
+    // window.open(`http://localhost:3000/api/documents/${id}`, "_blank"); // Opens in a new tab
+    // (_blank option is not strictly necessary)
+    navigate(`/users/documents/${id}`);
   };
-  const handleDeleteNote = async (id) => {
-    const response = await fetch(`http://localhost:3000/api/notes/${id}`, {
+  /*
+  const handleDeleteDocument = async (id) => {
+    const response = await fetch(`http://localhost:3000/api/documents/${id}`, {
       method: "DELETE",
       credentials: "include",
     });
@@ -47,7 +40,7 @@ const HomePage = () => {
     if (response.status === 401) {
       dispatch(authActions.unsetUser());
       // dispatch(notesActions.setNotes({ notes: [] }));
-      dispatch(notesActions.clearAll());
+      dispatch(documentsActions.clearAll());
       navigate("/login", { state: { message: "Time Out! Please login again" } });
       return;
     }
@@ -56,17 +49,24 @@ const HomePage = () => {
 
       return;
     }
-    dispatch(notesActions.deleteNote(id));
+    dispatch(documentsActions.deleteNote(id));
   };
+  */
 
   return (
     <MainLayout>
       <SidebarHome styles={"default"} isDeleting={isDeleting} setIsDeleting={setIsDeleting} />
-      <Content title={notes.length === 0 ? "You have no notes" : "All Your Notes Here"}>
+      <Content
+        title={
+          documents?.length === 0
+            ? "You have no documents"
+            : `You have ${documents.length} Documents`
+        }
+      >
         {/* {isLoading && <h1 className="mt-10 text-center">Loading your notes...</h1>} */}
         <div className="mt-10 grid xl:grid-cols-4 md:grid-cols-[repeat(3,31%)] sm:grid-cols-[repeat(2,45%)] grid-cols-1 justify-center gap-8">
-          {notesToDisplay?.length > 0 &&
-            notesToDisplay.map((note) => (
+          {documents?.length > 0 &&
+            documents.map((document) => (
               <Card
                 className="w-full hover:-translate-y-2 "
                 classNames={{
@@ -75,22 +75,23 @@ const HomePage = () => {
                 // isBlurred
                 isFooterBlurred
                 isPressable
-                onPress={() => handleViewNote(note._id)}
-                key={note._id}
+                onPress={() => handleViewDoc(document._id)}
+                key={document._id}
               >
                 <CardHeader className="justify-center">
                   <div className="flex gap-5">
                     <div className="flex flex-col gap-1 items-start justify-center">
                       <h3 className="text-medium font-semibold leading-none text-default-600">
-                        {note.title}
+                        {document.type}
                       </h3>
                     </div>
                   </div>
                 </CardHeader>
                 <CardBody>
                   <ScrollShadow hideScrollBar size={35} offset={5}>
-                    {/* {stripHtml(note.noteContent)} */}
-                    <div className="text-sm">{note.summary}</div>
+                    <div className="text-sm">{document.status}</div>
+                    <div className="text-sm">{document.submittedAt}</div>
+                    <div className="text-sm">{document.verifiedAt}</div>
                   </ScrollShadow>
                 </CardBody>
                 {/* <CardFooter className="absolute bg-white/30 bottom-0 border-t-1 border-zinc-100/50 z-10 justify-between"> */}
@@ -103,7 +104,7 @@ const HomePage = () => {
                         radius="full"
                         size="sm"
                         variant="ghost"
-                        onClick={() => handleDeleteNote(note._id)}
+                        // onClick={() => handleDeleteDocument(document._id)}
                       >
                         {/* <img src={CloseIcon} alt="" /> */}
                         Delete
@@ -111,11 +112,9 @@ const HomePage = () => {
                     </div>
                   ) : (
                     <div className="w-full flex flex-wrap gap-2 justify-center m-auto">
-                      {note.tags?.map((tag, index) => (
-                        <Chip key={index} variant="flat">
-                          {tag}
-                        </Chip>
-                      ))}
+                      <Chip key={document._id} variant="flat">
+                        {document.status}
+                      </Chip>
                     </div>
                   )}
                 </CardFooter>

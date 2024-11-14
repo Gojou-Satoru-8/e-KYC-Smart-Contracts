@@ -101,7 +101,7 @@ const Header = () => {
                 <DropdownItem
                   key="settings"
                   onClick={() => {
-                    navigate("/settings");
+                    navigate(`/${authState.entityType?.toLowerCase()}s/settings`);
                   }}
                 >
                   My Settings

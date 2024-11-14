@@ -1,5 +1,9 @@
+/* eslint-disable import/no-extraneous-dependencies */
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+const multer = require("multer");
+const sharp = require("sharp");
+const path = require("path");
 const User = require("../models/User");
 const Organization = require("../models/Organization");
 const Verifier = require("../models/Verifier");
@@ -65,7 +69,7 @@ const respondWithCookie = (res, statusCode, cookie, data) => {
 // };
 
 exports.checkAuth = catchAsync(async (req, res, next) => {
-  console.log("Cookies: ", req.cookies);
+  // console.log("Cookies: ", req.cookies);
 
   // let token;
   // let userType;
@@ -77,13 +81,14 @@ exports.checkAuth = catchAsync(async (req, res, next) => {
   // }
 
   const userType = Object.keys(userTypeToModel).find(
+    // (val) => Object.keys(req.cookies).includes(`jwt_${val.toLowerCase()}`)
     // (val) => req.cookies?.[`jwt_${val.toLowerCase()}`] !== undefined
     (val) => req.cookies?.[`jwt_${val.toLowerCase()}`]
   );
 
   console.log("Logged in Type found: ", userType);
 
-  if (!userType) throw new AppError(401, "No entity is not logged in"); // Either this or the one below
+  if (!userType) throw new AppError(401, "No entity is not logged in");
   // (1) Extract the token from the cookies and check if it exists:
   const token = req.cookies?.[`jwt_${userType.toLowerCase()}`];
 
@@ -110,7 +115,16 @@ exports.checkAuth = catchAsync(async (req, res, next) => {
   next();
 });
 
-// ROUTE: /users/login /organizations/login /verifiers/login [POST]
+exports.restrictTo = (userType) => {
+  // console.log("RESTRICTED TO: ", userType);
+  return (req, res, next) => {
+    if (!req[userType.toLowerCase()])
+      throw new AppError(403, `Restricted Route! Access permitted to ${userType} only`);
+    next();
+  };
+};
+
+// ROUTE: api/users/login api/organizations/login api/verifiers/login [POST]
 exports.signup = (userType) => {
   return catchAsync(async (req, res, next) => {
     // const { email, username, name, password, phoneNumber } = req.body; // For User
@@ -126,7 +140,7 @@ exports.signup = (userType) => {
   });
 };
 
-// ROUTE: /users/login [POST]
+// ROUTE: api/users/login [POST]
 exports.userLogin = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -149,7 +163,7 @@ exports.userLogin = catchAsync(async (req, res, next) => {
   respondWithCookie(res, 200, cookie, data);
 });
 
-// ROUTE: /organization/login [POST]:
+// ROUTE: api/organization/login [POST]:
 exports.organizationLogin = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -172,7 +186,7 @@ exports.organizationLogin = catchAsync(async (req, res, next) => {
   respondWithCookie(res, 200, cookie, data);
 });
 
-// ROUTE: /users/logout | /organizations/logout | /verifiers/logout [GET]
+// ROUTE: api/users/logout | api/organizations/logout | api/verifiers/logout [GET]
 exports.logout = (userType) => {
   return (req, res, next) => {
     const cookieName = `jwt_${userType.toLowerCase()}`;
@@ -192,7 +206,7 @@ exports.logout = (userType) => {
 //   res.status(200).json({ status: "Success", message: "Logged Out successfully" });
 // };
 
-// ROUTE: /users/generate-token | /organizations/generate-token | /verifiers/generate-token [POST]
+// ROUTE: api/users/generate-token | api/organizations/generate-token | api/verifiers/generate-token [POST]
 exports.mailPasswordResetToken = (userType) => {
   // This middleware requires email being sent in request body
   return catchAsync(async (req, res, next) => {
@@ -223,7 +237,7 @@ exports.mailPasswordResetToken = (userType) => {
   });
 };
 
-// ROUTE: /users/reset-password | /organizations/reset-password | /verifiers/reset-password [POST]:
+// ROUTE: api/users/reset-password | api/organizations/reset-password | api/verifiers/reset-password [POST]:
 // To be used when user is resetting forgotten passwor
 exports.resetPassword = (userType) => {
   return catchAsync(async (req, res, next) => {
@@ -266,7 +280,7 @@ exports.resetPassword = (userType) => {
   });
 };
 
-// ROUTE: /users/update-password | /organizations/update-password | /verifiers/update-password [POST]
+// ROUTE: api/users/update-password | api/organizations/update-password | api/verifiers/update-password [POST]
 exports.updatePassword = (userType) => {
   return catchAsync(async (req, res, next) => {
     // Requires current password, new password and token from request body
@@ -308,12 +322,12 @@ exports.updatePassword = (userType) => {
 
     res.status(200).json({
       status: "success",
-      message: "Password changed successfully! Please Log In",
+      message: "Password updated successfully!",
     });
   });
 };
 
-// ROUTE: /users
+// ROUTE: api/users [GET]
 exports.getCurrentUser = (req, res, next) => {
   if (!req.user && !req.organization && !req.verifier)
     return res.status(404).json({ status: "fail", message: "No entity logged in!" });
@@ -326,3 +340,78 @@ exports.getCurrentUser = (req, res, next) => {
     verifier: req.verifier,
   });
 };
+
+// ROUTE: api/users/
+exports.updateUser = catchAsync(async (req, res, next) => {
+  // const { username, name, publickey } = req.body;
+  /*
+  // NOTE: Not necessary
+  console.log("Before sanitizing: ", req.body);
+  if (req.body.publicKey) req.body.publicKey = req.body.publicKey.replace(/\r\n/g, "\n");
+  console.log("After saniziting: ", req.body);
+  */
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user._id,
+    { ...req.body },
+    { runValidators: true, new: true }
+  );
+
+  if (!updatedUser) throw new AppError(401, "User is not logged in");
+  res.status(200).json({
+    status: "success",
+    message: "User Updated Successfully",
+    entity: updatedUser,
+    entityType: "User",
+  });
+});
+
+const multerFilter = (req, file, cb) => {
+  console.log("------------- Multer Filter middleware:");
+  console.log({ file });
+
+  if (file.mimetype.startsWith("image"))
+    cb(null, true); // Proceed to next middleware
+  else {
+    console.log("Image unaccepted for this file: ", file);
+    cb(new AppError(400, "Unaccepted File type"), false);
+  }
+};
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  fileFilter: multerFilter,
+});
+
+// ROUTE: /users/update-pfp [POST]  // All following middlwares are used in sequence:
+exports.uploadPfp = upload.single("pfp");
+
+exports.resizeUserPhoto = (req, res, next) => {
+  // As only a single file was uploaded, it's available in req.file, in case of multiple uploads, it's req.files.
+  console.log("Photo: ", req.file);
+  if (!req.file) throw new AppError("No photo uploaded", 400, "JSON");
+
+  // NOTE: Since we're using memoryStorage(), thus there is no filename appended to file Object,
+  // as done by filename middleware in diskstorage() options. Thus we gotta set it manually.
+  // const fileExt = req.file.mimetype.split("/").at(-1);
+  // req.file.filename = `user-${user.id}-${req.file.originalname}.${fileExt}`;
+  req.file.filename = `user-${req.user.id}.jpeg`;
+  // NOTE: Extension is fixed to jpeg as we're saving as jpeg after processing via sharp.
+  // console.log("File Before resizing: ", req.file);
+  sharp(req.file.buffer)
+    .resize(500, 500)
+    .toFormat("jpeg")
+    .jpeg({ quality: 90 })
+    .toFile(path.resolve(__dirname, "..", "public/user-images", req.file.filename));
+  next();
+};
+
+exports.updatePfp = catchAsync(async (req, res, next) => {
+  console.log("User: ", req.file); // Has filename attribute crucially.
+
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user.id,
+    { photo: req.file.filename },
+    { new: true, runValidators: true }
+  );
+  res.status(200).json({ status: "success", message: "Pfp Changed Successfully" });
+});
