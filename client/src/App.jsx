@@ -1,6 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
-import LoginVerifierPage from "./pages/LoginVerifierPage";
+import VerifierLoginSignupPage from "./pages/VerifierLoginSignUpPage";
 import SignUpPage from "./pages/SignUpPage";
 import useGetCurrentUser from "./hooks/useGetCurrentUser";
 import ErrorPage from "./pages/ErrorPage";
@@ -32,7 +32,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/verifiers",
-        children: [],
+        children: [{ index: true, element: <h1>HomePage</h1> }],
       },
     ],
   },
@@ -42,7 +42,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/verifiers/login",
-    element: <LoginVerifierPage />,
+    element: <VerifierLoginSignupPage />,
   },
   {
     path: "/signup",

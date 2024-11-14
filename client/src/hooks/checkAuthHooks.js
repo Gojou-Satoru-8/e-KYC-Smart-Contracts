@@ -12,7 +12,7 @@ export const useRedirectIfNotAuthenticated = (redirectUrl = "/login") => {
   return authState;
 };
 
-// For routes like /log-in and /sign-up that redirect to home (/ route) if already logged in:
+// For routes like /login and /signup that redirect to home (/ route) if already logged in:
 export const useRedirectIfAuthenticated = (redirectUrl = "/") => {
   const authState = useSelector((state) => state.auth);
   const navigate = useNavigate();
@@ -27,15 +27,21 @@ export const useRedirectToCorrectHome = () => {
   const location = useLocation();
   const navigate = useNavigate();
   useEffect(() => {
-    // Redirect / to correct home page (/users or /organizations):
-    if (location.pathname === "/") {
-      if (authState.entityType === "User") navigate("/users");
-      else if (authState.entityType === "Organization") navigate("/organizations");
-    }
-    // Redirect unauthorized routes:
-    if (location.pathname.startsWith("/organizations") && authState.entityType === "User")
-      navigate("/users");
-    if (location.pathname.startsWith("/users") && authState.entityType === "Organization")
-      navigate("/organizations");
+    // Redirect / to correct home page (/users or /organizations or /verifiers):
+    // if (location.pathname === "/") {
+    //   if (authState.entityType === "User") navigate("/users");
+    //   else if (authState.entityType === "Organization") navigate("/organizations");
+    //   else if (authState.entityType === "Verifier") navigate("/verifiers");
+    // }
+    // Redirect unauthorized entities:
+    if (location.pathname.startsWith("/organizations") && authState.entityType !== "Organization")
+      navigate(`/${authState.entityType}s`);
+    if (location.pathname.startsWith("/users") && authState.entityType !== "User")
+      navigate(`/${authState.entityType}s`);
+    if (location.pathname.startsWith("/verifiers") && authState.entityType !== "Verifier")
+      navigate(`/${authState.entityType}s`);
+    // NOTE: Shorter way for redirecting unauthorized entities:
+    // if (location.pathname.split("/").at(1) !== `${authState.entityType?.toLowerCase()}s`)
+    navigate(`/${authState.entityType}s`);
   }, [authState.entityType, location.pathname, navigate]);
 };

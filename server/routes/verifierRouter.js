@@ -4,7 +4,7 @@ const authController = require("../controllers/authController");
 const router = express.Router({ mergeParams: true });
 
 router.route("/signup").post(authController.signup("Verifier"));
-// router.route("/login").post(authController.verifierLogin);
+router.route("/login").post(authController.verifierLogin);
 router.route("/generate-token").post(authController.mailPasswordResetToken("Verifier"));
 router.route("/reset-password").post(authController.resetPassword("Verifier"));
 

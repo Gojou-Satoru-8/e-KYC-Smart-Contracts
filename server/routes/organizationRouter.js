@@ -9,8 +9,8 @@ router.route("/generate-token").post(authController.mailPasswordResetToken("Orga
 router.route("/reset-password").post(authController.resetPassword("Organization"));
 
 router.use(authController.checkAuth);
-router.route("/logout").get(authController.logout("Organization"));
 // NOTE: The following routes require authentication (Organization must be logged in)
+router.route("/logout").get(authController.logout("Organization"));
 // router.route("/:id").patch(authController.updateOrganization).delete(authController.deleteOrganization);
 router.route("/update-password").post(authController.updatePassword("Organization"));
 

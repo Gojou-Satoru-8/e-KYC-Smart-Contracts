@@ -5,6 +5,22 @@ const bcrypt = require("bcrypt");
 
 const VerifierSchema = new mongoose.Schema(
   {
+    email: {
+      type: String,
+      unique: true,
+      trim: true,
+      required: [true, "Email is a required field"],
+      validate: [validator.isEmail, "Invalid Email"],
+    },
+    username: {
+      type: String,
+      unique: true,
+      trim: true,
+      required: [true, "Username is a required field"],
+      validate: [validator.isAlphanumeric, "Invalid Username"],
+      minLength: [3, "Username must have atleast 3 characters"],
+      maxLength: [15, "Username cannot exceed 15 characters"],
+    },
     name: {
       type: String,
       required: true,
@@ -25,14 +41,7 @@ const VerifierSchema = new mongoose.Schema(
         message: "Please enter a valid name.",
       },
       minLength: [3, "Name must have minimum 3 characters"],
-      maxLength: [10, "Name must not exceed 20 characters"],
-    },
-    email: {
-      type: String,
-      unique: true,
-      trim: true,
-      required: [true, "Email is a required field"],
-      validate: [validator.isEmail, "Invalid Email"],
+      maxLength: [20, "Name must not exceed 20 characters"],
     },
     role: {
       type: String,

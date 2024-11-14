@@ -134,7 +134,7 @@ exports.signup = (userType) => {
     const createdDoc = await Model.create({ ...req.body });
     res.status(201).json({
       status: "success",
-      message: "User created successfully! Please login",
+      message: `${userType} created successfully! Please login`,
       [userType.toLowerCase()]: createdDoc, // user: createdDoc or organization: createdDoc
     });
   });
@@ -183,6 +183,29 @@ exports.organizationLogin = catchAsync(async (req, res, next) => {
   // });
   const cookie = { name: "jwt_organization", value: token };
   const data = { status: "success", message: "Logged In Successfully", organization };
+  respondWithCookie(res, 200, cookie, data);
+});
+
+// ROUTE: api/organization/login [POST]:
+exports.verifierLogin = catchAsync(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  const verifier = await Verifier.findOne({ email }).select("+password");
+  console.log(verifier);
+
+  if (!verifier) throw new AppError(404, "No verifier found with this email");
+
+  const isPasswordMatch = await verifier.isPasswordCorrect(password);
+  if (!isPasswordMatch) throw new AppError(401, "Incorrect Password!");
+
+  const token = signToken(verifier._id);
+  console.log("JWT token for User before sending as cookie:", token);
+  // res.status(200).cookie("jwt_verifier", token).json({
+  //   status: "success",
+  //   message: "Logged In Successfully",
+  // });
+  const cookie = { name: "jwt_verifier", value: token };
+  const data = { status: "success", message: "Logged In Successfully", verifier };
   respondWithCookie(res, 200, cookie, data);
 });
 

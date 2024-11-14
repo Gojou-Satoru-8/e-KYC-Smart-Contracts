@@ -5,10 +5,10 @@ import { Button, Card, CardHeader, CardBody, CardFooter, Tabs, Tab } from "@next
 import Header from "../components/Header";
 import { authActions } from "../store";
 import { useRedirectIfAuthenticated } from "../hooks/checkAuthHooks";
-import LoginFormUser from "../components/LoginFormUser";
-import LoginFormOrganization from "../components/LoginFormOrganization";
+import LoginFormVerifier from "../components/LoginFormVerifier";
+import SignupFormVerifier from "../components/SignupFormVerifier";
 
-const LoginVerifierPage = () => {
+const VerifierLoginSignupPage = () => {
   //   const navigate = useNavigate();
   //   const dispatch = useDispatch();
 
@@ -22,7 +22,7 @@ const LoginVerifierPage = () => {
     message: navigateMessage || "",
     error: "",
   });
-  const [selectedForm, setSelectedForm] = useState("User"); // "User" / "Organization"
+  const [selectedForm, setSelectedForm] = useState("Login"); // "Login" / "Singup"
 
   const authState = useRedirectIfAuthenticated();
 
@@ -32,6 +32,10 @@ const LoginVerifierPage = () => {
     }, seconds * 1000);
     return timeout;
   };
+
+  //   const toggleSelectedForm = () => {
+  //     setSelectedForm((prev) => (prev === "User" ? "Organization" : "User"));
+  //   };
 
   useEffect(() => {
     if (uiElements.message || uiElements.error) {
@@ -46,7 +50,7 @@ const LoginVerifierPage = () => {
       <main className="h-[80vh] overflow-auto">
         <Card className="w-[95%] md:w-2/3 lg:w-1/2 mx-auto mt-8" isBlurred>
           <CardHeader className="flex-col justify-center pt-10 px-20 gap-4 text-center">
-            <h1 className="text-4xl">{selectedForm} Log In</h1>
+            <h1 className="text-4xl">Verifier {selectedForm}</h1>
             {uiElements.loading && (
               <div className="bg-primary rounded py-2 px-4">
                 <p>Validating... Please wait!</p>
@@ -72,14 +76,14 @@ const LoginVerifierPage = () => {
               selectedKey={selectedForm}
               onSelectionChange={setSelectedForm}
             >
-              <Tab key="User" title="User">
-                <LoginFormUser
+              <Tab key="Login" title="Login">
+                <LoginFormVerifier
                   setUIElements={setUIElements}
                   setTimeNotification={setTimeNotification}
                 />
               </Tab>
-              <Tab key="Organization" title="Organization">
-                <LoginFormOrganization
+              <Tab key="Signup" title="Signup">
+                <SignupFormVerifier
                   setUIElements={setUIElements}
                   setTimeNotification={setTimeNotification}
                 />
@@ -88,21 +92,20 @@ const LoginVerifierPage = () => {
           </CardBody>
           <CardFooter className="justify-center text-center">
             <div className="my-1 flex flex-col gap-2">
-              <p>
+              {/* <p>
                 Not a member yet?{" "}
                 <Link to="/signup" className="text-blue-500">
                   Sign Up
                 </Link>
-              </p>
-              <p>
-                Forgot Password? Reset it{" "}
-                <Link
-                  to={`/${selectedForm.toLowerCase()}s/forgot-password`}
-                  className="text-blue-500"
-                >
-                  Here
-                </Link>
-              </p>
+              </p> */}
+              {selectedForm === "Login" && (
+                <p>
+                  Forgot Password? Reset it{" "}
+                  <Link to={"/verifiers/forgot-password"} className="text-blue-500">
+                    Here
+                  </Link>
+                </p>
+              )}
             </div>
           </CardFooter>
         </Card>
@@ -111,4 +114,4 @@ const LoginVerifierPage = () => {
   );
 };
 
-export default LoginVerifierPage;
+export default VerifierLoginSignupPage;
