@@ -11,11 +11,22 @@ export const hashDocument = async function (documentFile) {
 */
 
 export const signDocument = async function (privateKeyPem, documentFile) {
-  const fileBuffer = await documentFile.arrayBuffer();
+  // const fileBuffer = await documentFile.arrayBuffer();
 
-  // Create message digest and update with document
+  // // Create message digest and update with document
+  // const mdDigest = md.sha256.create();
+  // mdDigest.update(util.binary.raw.encode(new Uint8Array(fileBuffer)));
+
+  const chunkSize = 64 * 1024; // 64KB chunks
+  const fileSize = documentFile.size;
   const mdDigest = md.sha256.create();
-  mdDigest.update(util.binary.raw.encode(new Uint8Array(fileBuffer)));
+
+  let offset = 0;
+  while (offset < fileSize) {
+    const chunk = await documentFile.slice(offset, offset + chunkSize).arrayBuffer();
+    mdDigest.update(util.binary.raw.encode(new Uint8Array(chunk)));
+    offset += chunkSize;
+  }
 
   // Sign the digest directly
   const privateKey = pki.privateKeyFromPem(privateKeyPem);

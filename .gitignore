@@ -23,5 +23,5 @@ dist-ssr
 *.sw?
 
 # Program files:
-server/temp/program*
-server/temp/a*
+server/temp/*
+server/documents/*

@@ -75,7 +75,7 @@ const GenerateKeysModal = () => {
 
       if (response.status === 401) {
         authActions.unsetEntity();
-        dispatch(documentsActions.clearDocuments());
+        dispatch(documentsActions.clearAll());
         navigate("/login", { state: { message: "Time Out! Please log-in again" } });
         return;
       }

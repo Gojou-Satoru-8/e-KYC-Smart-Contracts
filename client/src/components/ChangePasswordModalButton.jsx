@@ -112,7 +112,7 @@ const ChangePasswordModalButton = () => {
 
       if (response.status === 401) {
         dispatch(authActions.unsetEntity());
-        dispatch(documentsActions.clearDocuments());
+        dispatch(documentsActions.clearAll()());
         navigate("/login", { state: { message: "Time Out! Please log-in again" } });
         return;
       }

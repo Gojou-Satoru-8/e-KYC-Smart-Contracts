@@ -27,21 +27,22 @@ export const useRedirectToCorrectHome = () => {
   const location = useLocation();
   const navigate = useNavigate();
   useEffect(() => {
+    if (!authState.isAuthenticated) return;
     // Redirect / to correct home page (/users or /organizations or /verifiers):
-    // if (location.pathname === "/") {
-    //   if (authState.entityType === "User") navigate("/users");
-    //   else if (authState.entityType === "Organization") navigate("/organizations");
-    //   else if (authState.entityType === "Verifier") navigate("/verifiers");
-    // }
+    if (location.pathname === "/") {
+      if (authState.entityType === "User") navigate("/users");
+      else if (authState.entityType === "Organization") navigate("/organizations");
+      else if (authState.entityType === "Verifier") navigate("/verifiers");
+    }
     // Redirect unauthorized entities:
-    if (location.pathname.startsWith("/organizations") && authState.entityType !== "Organization")
+    // if (location.pathname.startsWith("/organizations") && authState.entityType !== "Organization")
+    //   navigate(`/${authState.entityType}s`);
+    // if (location.pathname.startsWith("/users") && authState.entityType !== "User")
+    //   navigate(`/${authState.entityType}s`);
+    // if (location.pathname.startsWith("/verifiers") && authState.entityType !== "Verifier")
+    //   navigate(`/${authState.entityType}s`);
+    // NOTE: Above logic simplified:
+    if (!location.pathname.startsWith(`/${authState.entityType.toLowerCase()}s`))
       navigate(`/${authState.entityType}s`);
-    if (location.pathname.startsWith("/users") && authState.entityType !== "User")
-      navigate(`/${authState.entityType}s`);
-    if (location.pathname.startsWith("/verifiers") && authState.entityType !== "Verifier")
-      navigate(`/${authState.entityType}s`);
-    // NOTE: Shorter way for redirecting unauthorized entities:
-    // if (location.pathname.split("/").at(1) !== `${authState.entityType?.toLowerCase()}s`)
-    navigate(`/${authState.entityType}s`);
-  }, [authState.entityType, location.pathname, navigate]);
+  }, [authState.isAuthenticated, authState.entityType, location.pathname, navigate]);
 };

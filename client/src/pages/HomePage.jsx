@@ -1,5 +1,5 @@
 import { useState } from "react";
-// import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import MainLayout from "../components/MainLayout";
 import SidebarHome from "../components/SidebarHome";
@@ -7,27 +7,30 @@ import Content from "../components/Content";
 // import { useEffect, useState } from "react";
 import { Card, CardHeader, CardBody, Button, CardFooter, Chip } from "@nextui-org/react";
 import { ScrollShadow } from "@nextui-org/scroll-shadow";
-import { useSelector, useDispatch } from "react-redux";
-// import usePopulateDocuments from "../hooks/usePopulateDocuments";
+
+// import usePopulateDocumentsTodocumentsToDisplay from "../hooks/usePopulateDocumentsTodocumentsToDisplay";
 // import { useRedirectIfNotAuthenticated } from "../hooks/checkAuthHooks";
 import { authActions, documentsActions } from "../store";
 // import CloseIcon from "../assets/close.png";
 
-const HomePage = () => {
+const HomePage = ({ userType }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const documentsState = useSelector((state) => state.documents);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  console.log("Notes-state: ", documentsState);
+  console.log("Documents-state: ", documentsState);
 
-  const { documents } = documentsState;
+  const { documents, selectedTags } = documentsState;
+  let documentsToDisplay = [];
+  if (selectedTags?.length === 0) documentsToDisplay = [...documents];
+  else documentsToDisplay = documents.filter((doc) => selectedTags.includes(doc.status));
   const handleViewDoc = async (id) => {
     // window.location.href = `http://localhost:3000/api/documents/${id}`;  // Opens in same tab
     // window.location.assign(`http://localhost:3000/api/documents/${id}`); // Opens in same tab
     // window.open(`http://localhost:3000/api/documents/${id}`, "_blank"); // Opens in a new tab
     // (_blank option is not strictly necessary)
-    navigate(`/users/documents/${id}`);
+    navigate(`/${userType.toLowerCase()}s/documents/${id}`);
   };
   /*
   const handleDeleteDocument = async (id) => {
@@ -38,8 +41,8 @@ const HomePage = () => {
     // const data = await response.json();
     // console.log(data);
     if (response.status === 401) {
-      dispatch(authActions.unsetUser());
-      // dispatch(notesActions.setNotes({ notes: [] }));
+      dispatch(authActions.unsetEntity());
+      // dispatch(documentsActions.setNotes({ notes: [] }));
       dispatch(documentsActions.clearAll());
       navigate("/login", { state: { message: "Time Out! Please login again" } });
       return;
@@ -58,15 +61,15 @@ const HomePage = () => {
       <SidebarHome styles={"default"} isDeleting={isDeleting} setIsDeleting={setIsDeleting} />
       <Content
         title={
-          documents?.length === 0
+          documentsToDisplay?.length === 0
             ? "You have no documents"
-            : `You have ${documents.length} Documents`
+            : `You have ${documentsToDisplay.length} Documents`
         }
       >
         {/* {isLoading && <h1 className="mt-10 text-center">Loading your notes...</h1>} */}
         <div className="mt-10 grid xl:grid-cols-4 md:grid-cols-[repeat(3,31%)] sm:grid-cols-[repeat(2,45%)] grid-cols-1 justify-center gap-8">
-          {documents?.length > 0 &&
-            documents.map((document) => (
+          {documentsToDisplay?.length > 0 &&
+            documentsToDisplay.map((document) => (
               <Card
                 className="w-full hover:-translate-y-2 "
                 classNames={{

@@ -79,7 +79,7 @@ const SettingsAccount = () => {
       console.log(response);
       if (response.status === 401) {
         dispatch(authActions.unsetUser());
-        dispatch(documentsActions.clearDocuments());
+        dispatch(documentsActions.clearAll());
         navigate("/log-in", { state: { message: "Time Out! Please log-in again" } });
         return;
       }

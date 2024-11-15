@@ -20,7 +20,7 @@ const router = createBrowserRouter([
       {
         path: "/users",
         children: [
-          { index: true, element: <HomePage /> },
+          { index: true, element: <HomePage userType={"User"} /> },
           { path: "/users/documents/:id", element: <DocPage /> },
           { path: "/users/new-document", element: <NewDocPage /> },
           { path: "/users/settings", element: <UserSettingsPage /> },
@@ -32,7 +32,10 @@ const router = createBrowserRouter([
       },
       {
         path: "/verifiers",
-        children: [{ index: true, element: <h1>HomePage</h1> }],
+        children: [
+          { index: true, element: <HomePage userType={"Verifier"} /> },
+          { path: "/verifiers/documents/:id", element: <DocPage /> },
+        ],
       },
     ],
   },

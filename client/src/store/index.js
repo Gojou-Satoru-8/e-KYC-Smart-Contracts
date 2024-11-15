@@ -31,19 +31,54 @@ const authSlice = createSlice({
   },
 });
 
-const initialDocumentsState = { documents: [] };
+const initialDocumentsState = {
+  documents: [],
+  tags: [],
+  selectedTags: JSON.parse(window.localStorage.getItem("selectedTags")) || [],
+};
+
+const extractTags = (documents = []) => {
+  const statuses = documents.map((doc) => doc.status);
+  const uniqueStatuses = new Set(statuses);
+  return [...uniqueStatuses];
+};
 const documentsSlice = createSlice({
   name: "documents",
   initialState: initialDocumentsState,
   reducers: {
     setDocuments: (state, action) => {
       state.documents = action.payload.documents;
-    },
-    clearDocuments: (state, action) => {
-      state.documents = [];
+      state.tags = extractTags(state.documents);
     },
     addDocument: (state, action) => {
       state.documents.push(action.payload.document);
+      state.tags = extractTags(state.documents);
+    },
+    clearAll: (state, action) => {
+      state.documents = [];
+      state.tags = [];
+      state.selectedTags = [];
+      window.localStorage.removeItem("selectedTags");
+    },
+
+    addSelectedTags: (state, action) => {
+      const tagToAdd = action.payload;
+      // const selectedTagsSet = new Set(state.selectedTags);
+      // selectedTagsSet.add(action.payload);
+      // state.selectedTags = [...selectedTagsSet];
+      if (state.selectedTags?.includes(tagToAdd)) return;
+      state.selectedTags.push(tagToAdd);
+      // console.log(state.selectedTags.join(","));
+      window.localStorage.setItem("selectedTags", JSON.stringify(state.selectedTags));
+    },
+    removeSelectedTags: (state, action) => {
+      const tagToRemove = action.payload;
+      state.selectedTags = state.selectedTags.filter((tag) => tag !== tagToRemove);
+      window.localStorage.setItem("selectedTags", JSON.stringify(state.selectedTags));
+    },
+    clearSelectedTags: (state, action) => {
+      state.selectedTags = [];
+      window.localStorage.removeItem("selectedTags");
     },
   },
 });

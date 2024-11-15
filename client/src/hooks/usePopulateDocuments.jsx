@@ -10,8 +10,10 @@ const usePopulateDocuments = (entityType) => {
   console.log(documentsState);
 
   useEffect(() => {
-    // DONT FETCH DOCUMENTS IN CASE ORGANIZATION IS LOGGED IN:
-    if (entityType === "Organization") return;
+    // ONLY FETCH DOCUMENTS IN CASE OF USER OR VERIFIER LOG IN:
+    if (entityType !== "User" && entityType !== "Verifier") return;
+    // This covers the case of entityType being "Organization" or entityType being null, in case of first load
+    // where authState.entityType has the initial value of null.
     const fetchAllDocuments = async () => {
       let URL = "http://localhost:3000/api/documents";
       if (entityType === "Verifier") URL += "/all";
@@ -23,7 +25,7 @@ const usePopulateDocuments = (entityType) => {
         if (response.status === 401) {
           // navigate("/login", { state: { message: "Time Out! Please login again" } });
           dispatch(authActions.unsetEntity());
-          dispatch(documentsActions.clearDocuments());
+          dispatch(documentsActions.clearAll());
           navigate("/login");
           return;
           // NOTE: usePopulateDocuments hook follows the RedirectIfNotAuthenticated Hook, which means that if this hook runs,
@@ -34,7 +36,7 @@ const usePopulateDocuments = (entityType) => {
 
         if (response.status === 404) {
           console.warn("No documents found:", data.message);
-          dispatch(documentsActions.clearDocuments());
+          dispatch(documentsActions.clearAll());
           return;
         }
 
