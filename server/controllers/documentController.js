@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const crypto = require("crypto");
 const fsPromises = require("fs/promises");
@@ -9,7 +10,7 @@ const { verifySignature } = require("../utils/crypto");
 
 // ROUTE: /api/documents/all [GET] - Restricted to verifiers only:
 exports.getAllDocuments = catchAsync(async (req, res, next) => {
-  const documents = await KYCDocument.find();
+  const documents = await KYCDocument.find().populate("user");
   console.log(documents);
 
   if (documents.length === 0) throw new AppError(404, "No documents in the DB");
@@ -21,7 +22,7 @@ exports.getAllDocuments = catchAsync(async (req, res, next) => {
   });
 });
 
-// ROUTE: /api/documents/ [GET]
+// ROUTE: /api/documents/ [GET] - Restricted To users only:
 exports.getDocumentsByUser = catchAsync(async (req, res, next) => {
   // This middleware will be preceded by checkAuth, and will only give info from KYCDocument schema, ie only the path
   // and the actual file content (which stays encrypted on-disk) isn't served.
@@ -228,4 +229,75 @@ exports.downloadDocumentById = catchAsync(async (req, res, next) => {
   res.setHeader("Content-Disposition", 'inline; filename="document.pdf"');
   // Send the decrypted buffer
   res.send(decryptedBuffer);
+});
+
+// ROUTE: /all/:id [PATCH]
+exports.updateStatus = catchAsync(async (req, res, next) => {
+  // const {id} = req.params;
+  // const {status} = req.body;
+  console.log("TRIGGERED UPDATE STATUS", req.body); // status and rejectionReason
+
+  if (!req.params.id) throw new AppError(400, "Missing Document ID");
+
+  if (!req.body.status) throw new AppError(406, "Missing Status");
+
+  const updatedDocument = await KYCDocument.findByIdAndUpdate(
+    req.params.id,
+    { ...req.body },
+    { runValidators: true, new: true }
+  );
+  if (!updatedDocument) throw new AppError(404, "No document with the provided ID");
+
+  // console.log(updatedDocument);
+
+  res.status(200).json({
+    status: "success",
+    message: "Document Status updated successfully",
+    document: updatedDocument,
+  });
+});
+
+// ROUTE: /api/documents/share/ [POST] - Restricted to User only
+exports.generateShareCode = catchAsync(async (req, res, next) => {
+  const { organizationId, documentId } = req.body;
+
+  if (!documentId) throw new AppError(404, "Missing Document ID");
+  if (!organizationId) throw new AppError(404, "Missing Organization ID");
+
+  const document = await KYCDocument.findById(documentId);
+  if (!document.status === "Approved")
+    throw new AppError(403, "Document is not approved! Thus cannot be shared");
+
+  const payload = { userId: req.user.id, organizationId: organizationId, documentId: documentId };
+  const token = jwt.sign(payload, process.env.JWT_SHARE_KEY, {
+    expiresIn: process.env.JWT_SHARE_KEY_EXPIRES_IN,
+  });
+  console.log("SHARE TOKEN: ", token);
+
+  res.status(200).json({ status: "success", message: "Share Token Generated", token });
+});
+
+// ROUTE: /api/documents/share/:token [GET] - Restricted to Organization only
+exports.getSharedDocument = catchAsync(async (req, res, next) => {
+  const { token } = req.params;
+
+  if (!token) throw new AppError(404, "Missing share token/code");
+
+  const decoded = jwt.verify(token, process.env.JWT_SHARE_KEY);
+  console.log("Original payload inside share token/code: ", decoded);
+
+  if (decoded.organizationId !== req.organization.id)
+    throw new AppError(403, "Forbidden Access to this Organization.");
+
+  const document = await KYCDocument.findOne({ _id: decoded.documentId, user: decoded.userId });
+  // NOTE: Here it is possible to get document by id only, but as a safety parameter, we include the userId so that
+  // a user can only share his own document, even if he gets someone else's document.
+
+  if (!document) throw new AppError(404, "No such document with this share token");
+
+  res.status(200).json({
+    status: "success",
+    message: "Document retrieved successfully",
+    document,
+  });
 });

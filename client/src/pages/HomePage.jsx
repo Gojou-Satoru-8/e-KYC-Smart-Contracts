@@ -13,6 +13,8 @@ import { ScrollShadow } from "@nextui-org/scroll-shadow";
 import { authActions, documentsActions } from "../store";
 // import CloseIcon from "../assets/close.png";
 
+const statusColor = { Pending: "warning", Approved: "success", Rejected: "danger" };
+
 const HomePage = ({ userType }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -115,7 +117,11 @@ const HomePage = ({ userType }) => {
                     </div>
                   ) : (
                     <div className="w-full flex flex-wrap gap-2 justify-center m-auto">
-                      <Chip key={document._id} variant="flat">
+                      <Chip
+                        key={document._id}
+                        variant="shadow"
+                        color={statusColor[document.status]}
+                      >
                         {document.status}
                       </Chip>
                     </div>

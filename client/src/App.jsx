@@ -7,7 +7,9 @@ import ErrorPage from "./pages/ErrorPage";
 import RootLayout from "./pages/RootLayout";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import HomePage from "./pages/HomePage";
-import DocPage from "./pages/DocPage";
+import HomePageOrganization from "./pages/HomePageOrganization";
+import DocPageUser from "./pages/DocPageUser";
+import DocPageVerifier from "./pages/DocPageVerifier";
 import NewDocPage from "./pages/NewDocPage";
 import UserSettingsPage from "./pages/UserSettingsPage";
 
@@ -21,20 +23,20 @@ const router = createBrowserRouter([
         path: "/users",
         children: [
           { index: true, element: <HomePage userType={"User"} /> },
-          { path: "/users/documents/:id", element: <DocPage /> },
+          { path: "/users/documents/:id", element: <DocPageUser /> },
           { path: "/users/new-document", element: <NewDocPage /> },
           { path: "/users/settings", element: <UserSettingsPage /> },
         ],
       },
       {
         path: "/organizations",
-        children: [{ index: true, element: <h1>HomePage</h1> }],
+        children: [{ index: true, element: <HomePageOrganization /> }],
       },
       {
         path: "/verifiers",
         children: [
           { index: true, element: <HomePage userType={"Verifier"} /> },
-          { path: "/verifiers/documents/:id", element: <DocPage /> },
+          { path: "/verifiers/documents/:id", element: <DocPageVerifier /> },
         ],
       },
     ],

@@ -20,8 +20,8 @@ const KYCDocumentSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: {
-        values: ["Pending", "Verified", "Rejected"],
-        message: "Status must be any of Pending | Verified | Rejected",
+        values: ["Pending", "Approved", "Rejected"],
+        message: "Status must be any of Pending | Approved | Rejected",
       },
       default: "Pending",
     },
@@ -34,7 +34,7 @@ const KYCDocumentSchema = new mongoose.Schema(
 );
 
 KYCDocumentSchema.virtual("is_verified").get(function () {
-  return this.status === "Verified";
+  return this.status !== "Pending";
 });
 const KYCDocument = mongoose.model("KYCDocument", KYCDocumentSchema);
 module.exports = KYCDocument;

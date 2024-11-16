@@ -1,8 +1,11 @@
 import { Divider, Button } from "@nextui-org/react";
 import { Link } from "react-router-dom";
 import HomeIcon from "../assets/home.png";
+import SettingsIcon from "../assets/settings.png";
+import { useSelector } from "react-redux";
 
 const SidebarDoc = ({ styles, children }) => {
+  const authState = useSelector((state) => state.auth);
   return (
     <div
       className={
@@ -19,6 +22,18 @@ const SidebarDoc = ({ styles, children }) => {
               startContent={<img src={HomeIcon}></img>}
             >
               Home
+            </Button>
+          </Link>
+        </div>
+        <div className="py-1 text-center">
+          <Link to={`/${authState.entityType?.toLowerCase()}s/settings`}>
+            <Button
+              color="secondary"
+              variant="ghost"
+              className="w-[80%]"
+              startContent={<img width="22px" src={SettingsIcon}></img>}
+            >
+              Settings
             </Button>
           </Link>
         </div>

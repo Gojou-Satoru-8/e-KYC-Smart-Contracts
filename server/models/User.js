@@ -45,7 +45,7 @@ const UserSchema = new mongoose.Schema(
     },
     phoneNumber: { type: String, required: [true, "User must provide a phone number"] },
     photo: { type: String, default: "/src/assets/account-image.png" },
-    publicKey: String,
+    publicKey: { type: String, select: false },
     createdAt: { type: Date, default: Date.now },
     isVerified: { type: Boolean, default: false },
     password: {
@@ -57,6 +57,7 @@ const UserSchema = new mongoose.Schema(
       ],
       minLength: [8, "Password must have minimum 8 characters"],
       maxLength: [20, "Password must not exceed 20 characters"],
+      select: false,
     },
     lastPasswordChanged: {
       type: Date,
@@ -65,6 +66,8 @@ const UserSchema = new mongoose.Schema(
     },
     passwordResetToken: { type: String, select: false },
     passwordResetTokenExpiry: { type: Date, select: false },
+    publicKeyResetToken: { type: String, select: false },
+    publicKeyResetTokenExpiry: { type: Date, select: false },
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
@@ -102,6 +105,30 @@ UserSchema.methods.discardPasswordResetToken = async function () {
   await this.save({ validateBeforeSave: false });
 };
 
+UserSchema.methods.generatePublicKeyResetToken = async function () {
+  const token = crypto.randomBytes(32).toString("hex");
+
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+  this.publicKeyResetToken = hashedToken;
+  this.publicKeyResetTokenExpiry =
+    Date.now() + Number.parseInt(process.env.PASSWORD_RESET_TOKEN_EXPIRY) * 1000;
+  await this.save({ validateBeforeSave: false });
+  // console.log("User after generating a reset token: ", this);
+  console.log("Info about Password Reset Token generated:\n", {
+    token,
+    hashedToken,
+    expiry: this.publicKeyResetTokenExpiry.toLocaleString("en-GB", { timezone: "Asia/Kolkata" }),
+  });
+
+  return token;
+};
+
+UserSchema.methods.discardPublicKeyResetToken = async function () {
+  this.publicKeyResetToken = undefined;
+  this.publicKeyResetTokenExpiry = undefined;
+  await this.save({ validateBeforeSave: false });
+};
+
 UserSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.lastPasswordChanged) {
     const changedTimestamp = Number.parseInt(this.lastPasswordChanged / 1000);
@@ -117,6 +144,9 @@ UserSchema.pre("save", async function (next) {
   this.lastPasswordChanged = Date.now();
   next();
 });
-
+UserSchema.pre(/^find/, async function (next) {
+  this.select("-__v");
+  next();
+});
 const User = mongoose.model("User", UserSchema);
 module.exports = User;

@@ -58,7 +58,7 @@ const ChangePasswordModalButton = () => {
     return timeout;
   };
 
-  const getTokenMail = async (e) => {
+  const getPasswordResetTokenMail = async (e) => {
     // setUIElements({
     //   loading: false,
     //   message: "",
@@ -68,14 +68,14 @@ const ChangePasswordModalButton = () => {
     setTimeNotification({ tokenMsg: "Trying to mail your Token..." });
     // onOpen(); // Opens the modal
     try {
-      const response = await fetch("http://localhost:3000/api/users/generate-token", {
+      const response = await fetch("http://localhost:3000/api/users/generate-password-token", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: authState.entity.email }),
         // credentials: "include"
       });
       const data = await response.json();
-      if (!response.ok || data.status === "fail") {
+      if (!response.ok || data.status !== "success") {
         setTimeNotification({ error: data.message }, 1.5);
         return;
       }
@@ -243,7 +243,12 @@ const ChangePasswordModalButton = () => {
                   ></Input>
                 </ModalBody>
                 <ModalFooter>
-                  <Button type="button" color="success" variant="light" onClick={getTokenMail}>
+                  <Button
+                    type="button"
+                    color="success"
+                    variant="light"
+                    onClick={getPasswordResetTokenMail}
+                  >
                     Get Token
                   </Button>
                   <Button type="submit" color="primary" variant="light">

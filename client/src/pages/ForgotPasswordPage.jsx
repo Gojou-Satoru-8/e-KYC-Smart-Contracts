@@ -49,7 +49,7 @@ const ForgotPasswordPage = ({ userType }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/api/${userType.toLowerCase()}s/generate-token`,
+        `http://localhost:3000/api/${userType.toLowerCase()}s/generate-password-token`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

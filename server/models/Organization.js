@@ -15,7 +15,7 @@ const OrganizationSchema = new mongoose.Schema(
     },
     name: {
       type: String,
-      // unique: true,
+      unique: true,
       trim: true,
       required: [true, "Organization Name is a required field"],
       validate: {

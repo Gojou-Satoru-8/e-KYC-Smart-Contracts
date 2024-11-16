@@ -104,14 +104,14 @@ exports.checkAuth = catchAsync(async (req, res, next) => {
   // else if (userType === "Verifier") Model = Verifier;
   const Model = userTypeToModel[userType];
   // (3) Find user/organization/verifier based on id inside the decoded token (payload).
-  const document = await Model.findById(decoded.id);
-  if (!document) throw new AppError(`${userType} associated with the id no longer exists`);
+  const entity = await Model.findById(decoded.id);
+  if (!entity) throw new AppError(`${userType} associated with the id no longer exists`);
 
   // (4) Check if password was changed after token generation:
-  if (decoded.iat * 1000 < document.lastPasswordChanged)
+  if (decoded.iat * 1000 < entity.lastPasswordChanged)
     throw new AppError(401, "Password changed after JWT was issued");
 
-  req[userType.toLowerCase()] = document; // req.user | req.organization | req.verifier
+  req[userType.toLowerCase()] = entity; // req.user | req.organization | req.verifier
   next();
 });
 
@@ -229,7 +229,7 @@ exports.logout = (userType) => {
 //   res.status(200).json({ status: "Success", message: "Logged Out successfully" });
 // };
 
-// ROUTE: api/users/generate-token | api/organizations/generate-token | api/verifiers/generate-token [POST]
+// ROUTE: api/users/generate-password-token | api/organizations/generate-password-token | api/verifiers/generate-password-token [POST]
 exports.mailPasswordResetToken = (userType) => {
   // This middleware requires email being sent in request body
   return catchAsync(async (req, res, next) => {
@@ -276,7 +276,7 @@ exports.resetPassword = (userType) => {
       "+password +passwordResetTokenExpiry"
     );
 
-    if (!doc) throw new AppError(400, "Invalid Token");
+    if (!doc) throw new AppError(406, "Invalid Token");
     console.log(`${userType} found`, doc);
     console.log(
       "Password Reset Token Expiry in IST: ",
@@ -285,11 +285,11 @@ exports.resetPassword = (userType) => {
 
     // (3) Check if token has expired (it's expiry time in unix timestamp must be less than now)
     if (doc.passwordResetTokenExpiry < Date.now())
-      throw new AppError(400, "Token for updating password has expired");
+      throw new AppError(406, "Token for updating password has expired");
 
     // (4) Check if password matches the existing one
     const isPasswordMatch = await doc.isPasswordCorrect(password);
-    if (isPasswordMatch) throw new AppError(400, "New Password cannot be the same as current one");
+    if (isPasswordMatch) throw new AppError(406, "New Password cannot be the same as current one");
 
     // (5) Proceed towards updating the password
     doc.password = password;
@@ -318,7 +318,7 @@ exports.updatePassword = (userType) => {
       "+password +passwordResetTokenExpiry"
     );
 
-    if (!doc) throw new AppError(401, "Invalid Token");
+    if (!doc) throw new AppError(406, "Invalid Token");
     console.log(`${userType} found`, doc);
     console.log(
       "Password Reset Token Expiry in IST: ",
@@ -327,15 +327,15 @@ exports.updatePassword = (userType) => {
 
     // (3) Check if token has expired (it's expiry time in unix timestamp must be less than now):
     if (doc.passwordResetTokenExpiry < Date.now())
-      throw new AppError(400, "Token for updating password has expired");
+      throw new AppError(406, "Token for updating password has expired");
 
     // (4) Check is currentPassword is same:
     const isPasswordMatch = await doc.isPasswordCorrect(currentPassword);
-    if (!isPasswordMatch) throw new AppError(400, "Current Password is Incorrect!");
+    if (!isPasswordMatch) throw new AppError(406, "Current Password is Incorrect!");
 
     // (5) New password shouldn't be the same as old password
     if (currentPassword === newPassword)
-      throw new AppError(400, "New Password cannot be the same as current one");
+      throw new AppError(406, "New Password cannot be the same as current one");
     // Client-side has same validation, so it is likely not to be triggered
 
     // (6) Proceed towards updating the password
@@ -364,7 +364,7 @@ exports.getCurrentUser = (req, res, next) => {
   });
 };
 
-// ROUTE: api/users/
+// ROUTE: api/users/ [PATCH]
 exports.updateUser = catchAsync(async (req, res, next) => {
   // const { username, name, publickey } = req.body;
   /*
@@ -379,12 +379,75 @@ exports.updateUser = catchAsync(async (req, res, next) => {
     { runValidators: true, new: true }
   );
 
-  if (!updatedUser) throw new AppError(401, "User is not logged in");
+  if (!updatedUser) throw new AppError(401, "User is not logged in"); // Will be handled by the checkAuth middleware
   res.status(200).json({
     status: "success",
     message: "User Updated Successfully",
     entity: updatedUser,
     entityType: "User",
+  });
+});
+
+// ROUTE: /api/users/generate-key-token [GET]
+exports.mailPublicKeyResetToken = catchAsync(async (req, res, next) => {
+  // This is different from mailing password-reset token, as this exclusively requires the user to be logged in
+  // Hence we already have the user document, thus this requires a GET request.
+
+  // const user = await User.findOne({ email: req.user.email });
+  // if (!user) throw new AppError(404, `No user associated with the email`);
+  // const {user} = req;  // Use this instead of above lines
+  const token = await req.user.generatePublicKeyResetToken();
+  const message = `Enter this token to reset your password:\n${token}`;
+  try {
+    await sendMail({
+      recipient: ["ankushbhowmikf12@gmail.com", "itsmeankush893@outlook.com", req.user.email],
+      subject: "Reset Public-Key Token (Valid for 10 minutes)",
+      mailBody: message,
+    });
+    console.log("Mail sent successfully");
+    res.status(200).json({
+      status: "success",
+      message: `Public-Key reset token sent to your email at ${new Date().toLocaleString("en-UK", {
+        timeZone: "Asia/Kolkata",
+      })}`,
+    });
+  } catch (err) {
+    await req.user.discardPublicKeyResetToken();
+    throw new AppError(500, err.message);
+  }
+});
+
+// ROUTE: /api/users/update-key [POST]
+exports.updatePublicKey = catchAsync(async (req, res, next) => {
+  const { token, publicKey } = req.body;
+
+  if (!token) throw new AppError(404, "Missing Token");
+  // if (!publicKey) throw new AppError(404, "Missing Public Key");
+  // NOTE: Remove this in production environment, as this will be generated by client code and not mannually input by user.
+
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+  const user = await User.findOne({ publicKeyResetToken: hashedToken }).select(
+    "+publicKey +publicKeyResetTokenExpiry"
+  );
+  if (!user) throw new AppError(406, "Invalid Token");
+  console.log("User found", user);
+  console.log(
+    "Public-key Reset Token Expiry in IST: ",
+    user.publicKeyResetTokenExpiry.toLocaleString("en-GB", { timezone: "Asia/Kolkata" })
+  );
+
+  // (3) Check if token has expired (it's expiry time in unix timestamp must be less than now):
+  if (user.publicKeyResetTokenExpiry < Date.now())
+    throw new AppError(400, "Token for updating keys has expired");
+
+  // (4) Proceed towards updating the password
+  user.publicKey = publicKey;
+  await user.save({ validateBeforeSave: true });
+  await user.discardPublicKeyResetToken();
+
+  res.status(200).json({
+    status: "success",
+    message: "Password updated successfully!",
   });
 });
 

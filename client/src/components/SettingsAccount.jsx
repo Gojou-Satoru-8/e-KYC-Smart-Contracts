@@ -17,6 +17,7 @@ import ChangePasswordModalButton from "./ChangePasswordModalButton";
 import GenerateKeysModal from "./GenerateKeysModal";
 import { MailIcon } from "../assets/MailIcon";
 import { UserIcon } from "../assets/UserIcon";
+import PhoneIcon from "../assets/PhoneIcon";
 // import { EyeFilledIcon, EyeSlashFilledIcon } from "../assets/EyeIconsPassword";
 
 const SettingsAccount = () => {
@@ -77,20 +78,21 @@ const SettingsAccount = () => {
       });
 
       console.log(response);
+      const data = await response.json();
+      console.log("Data: ", data);
+
       if (response.status === 401) {
-        dispatch(authActions.unsetUser());
+        dispatch(authActions.unsetEntity());
         dispatch(documentsActions.clearAll());
-        navigate("/log-in", { state: { message: "Time Out! Please log-in again" } });
+        navigate("/login", { state: { message: "Time Out! Please log in again" } });
         return;
       }
 
-      const data = await response.json();
-      console.log("Data: ", data);
       if (!response.ok || data.status === "fail") {
         setTimeNotification({ error: data.message }, 2);
         return;
       }
-      // TODO: Update user api remains
+      // TODO: Update user api remains [EDIT: Partially done, need to separate user-update from updating public key]
       dispatch(authActions.updateEntity({ entity: data.entity, entityType: data.entityType }));
       setTimeNotification({ message: data.message }, 2);
     } catch (err) {
@@ -119,9 +121,9 @@ const SettingsAccount = () => {
                 // color="secondary"
                 // showFallback
                 src={userInfo.photo}
-                // name={authState.entity.name}
+                // name={userInfo.name}
               ></Avatar>
-              <h3 className="text-3xl text-center">{authState.entity?.name}</h3>
+              <h3 className="text-3xl text-center">{userInfo.name}</h3>
             </>
           )}
 
@@ -171,7 +173,7 @@ const SettingsAccount = () => {
             // variant="underlined"
             classNames={{ input: "text-center" }}
             startContent={
-              <MailIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0 m-auto" />
+              <PhoneIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0 m-auto" />
             }
             required
           ></Input>

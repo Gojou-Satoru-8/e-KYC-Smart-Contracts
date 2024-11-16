@@ -54,6 +54,16 @@ const documentsSlice = createSlice({
       state.documents.push(action.payload.document);
       state.tags = extractTags(state.documents);
     },
+
+    updateDocument: (state, action) => {
+      const indexOfDocToUpdate = state.documents.findIndex(
+        (doc) => doc._id === action.payload.document._id
+      );
+      if (indexOfDocToUpdate !== -1) {
+        state.documents[indexOfDocToUpdate] = action.payload.document;
+        state.tags = extractTags(state.documents);
+      }
+    },
     clearAll: (state, action) => {
       state.documents = [];
       state.tags = [];

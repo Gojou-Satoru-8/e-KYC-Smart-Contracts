@@ -7,6 +7,8 @@ import { useDispatch, useSelector } from "react-redux";
 import CloseIcon from "../assets/close (1).png";
 import { documentsActions } from "../store";
 
+const statusColor = { Pending: "warning", Approved: "success", Rejected: "danger" };
+
 const SidebarHome = ({ isDeleting, setIsDeleting, styles }) => {
   const dispatch = useDispatch();
   const authState = useSelector((state) => state.auth);
@@ -98,7 +100,7 @@ const SidebarHome = ({ isDeleting, setIsDeleting, styles }) => {
                   <Button
                     size="sm"
                     variant={selectedTags?.includes(tag) ? "solid" : "ghost"}
-                    color="primary"
+                    color={statusColor[tag]}
                     radius="full"
                     onClick={() => {
                       // console.log("Outer button clicked");

@@ -5,7 +5,9 @@ const router = express.Router({ mergeParams: true });
 
 router.route("/signup").post(authController.signup("Organization"));
 router.route("/login").post(authController.organizationLogin);
-router.route("/generate-token").post(authController.mailPasswordResetToken("Organization"));
+router
+  .route("/generate-password-token")
+  .post(authController.mailPasswordResetToken("Organization"));
 router.route("/reset-password").post(authController.resetPassword("Organization"));
 
 router.use(authController.checkAuth);
