@@ -16,7 +16,7 @@ import { authActions, documentsActions } from "../store";
 import ChangePasswordModalButton from "./ChangePasswordModalButton";
 import GenerateKeysModalButton from "./GenerateKeysModalButton";
 import UpdatePfpModalButton from "./UpdatePfpModalButton";
-import EmailVerificationModalButton from "./EmailVerificationModalButton";
+import VerificationModalButton from "./VerificationModalButton";
 import { MailIcon } from "../assets/MailIcon";
 import { UserIcon } from "../assets/UserIcon";
 import PhoneIcon from "../assets/PhoneIcon";
@@ -55,7 +55,6 @@ const SettingsAccount = () => {
       username: authState.entity?.username,
       name: authState.entity?.name,
       phoneNumber: authState.entity?.phoneNumber,
-      photo: authState.entity?.photo,
     });
     setIsEditing(false);
   };
@@ -96,7 +95,7 @@ const SettingsAccount = () => {
         setTimeNotification({ error: data.message }, 2);
         return;
       }
-      // TODO: Update user api remains [EDIT: Partially done, need to separate user-update from updating public key]
+
       dispatch(authActions.updateEntity({ entity: data.entity, entityType: data.entityType }));
       setTimeNotification({ message: data.message }, 2);
     } catch (err) {
@@ -124,12 +123,12 @@ const SettingsAccount = () => {
                 // isBordered
                 // color="secondary"
                 // showFallback
-                src={userInfo.photo}
+                src={authState.entity?.photo}
                 // name={userInfo.name}
               ></Avatar> */}
               <UpdatePfpModalButton
                 photoSrc={`http://localhost:3000/src/user-images/${
-                  userInfo.photo
+                  authState.entity?.photo
                 }?t=${new Date().getTime()}`}
               />
               <h3 className="text-3xl text-center">{userInfo.name}</h3>
@@ -168,7 +167,9 @@ const SettingsAccount = () => {
             startContent={
               <MailIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0 m-auto" />
             }
-            endContent={!userInfo.isEmailVerified && <EmailVerificationModalButton />}
+            endContent={
+              !authState.entity?.isEmailVerified && <VerificationModalButton property={"email"} />
+            }
             required
           ></Input>
           <Input
@@ -186,10 +187,8 @@ const SettingsAccount = () => {
               <PhoneIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0 m-auto" />
             }
             endContent={
-              !userInfo.isPhoneNumberVerified && (
-                <Button size="sm" color="warning">
-                  Verify
-                </Button>
+              !authState.entity?.isPhoneNumberVerified && (
+                <VerificationModalButton property={"phone"} />
               )
             }
             required

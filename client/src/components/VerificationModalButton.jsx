@@ -14,7 +14,8 @@ import { Form, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { authActions, documentsActions } from "../store";
 
-const EmailVerificationModalButton = ({ property }) => {
+const VerificationModalButton = ({ property }) => {
+  // NOTE: Property is either "email" or "phone"
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const authState = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -28,12 +29,16 @@ const EmailVerificationModalButton = ({ property }) => {
     return timeout;
   };
 
-  const getEmailVerificationMail = async (e) => {
-    setTokenState({ tokenMsg: "Trying to mail your Token...", tokenSent: false });
+  const getVerificationToken = async (e) => {
+    setTokenState({
+      tokenMsg: `Trying to ${property === "email" ? "mail" : "sms"} your Token...`,
+      tokenSent: false,
+    });
     try {
-      const response = await fetch("http://localhost:3000/api/users/email-verification-token", {
-        credentials: "include",
-      });
+      const response = await fetch(
+        `http://localhost:3000/api/users/${property}-verification-token`,
+        { credentials: "include" }
+      );
       console.log(response);
       const data = await response.json();
       console.log(data);
@@ -55,7 +60,7 @@ const EmailVerificationModalButton = ({ property }) => {
       setTimeNotification({ error: err.message });
     }
   };
-  const sendEmailVerificationToken = async (e) => {
+  const sendVerificationToken = async (e) => {
     e.preventDefault();
     // setUIElements({ loading: true, message: "", error: "", tokenMsg: "" });
     setTimeNotification({ loading: true });
@@ -67,14 +72,19 @@ const EmailVerificationModalButton = ({ property }) => {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/api/users/email-verification-token", {
-        method: "POST",
-        body: JSON.stringify(formDataObj),
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-      });
+      const response = await fetch(
+        `http://localhost:3000/api/users/${property}-verification-token`,
+        {
+          method: "POST",
+          body: JSON.stringify(formDataObj),
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }
+      );
 
       const data = await response.json();
+      console.log(data);
+
       if (response.status === 401) {
         dispatch(authActions.unsetEntity());
         dispatch(documentsActions.clearAll());
@@ -132,8 +142,10 @@ const EmailVerificationModalButton = ({ property }) => {
         <ModalContent>
           {(closeModal) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">Verify your Email</ModalHeader>
-              <Form onSubmit={sendEmailVerificationToken}>
+              <ModalHeader className="flex flex-col gap-1">
+                Verify your {property === "email" ? "Email" : "Phone Number"}
+              </ModalHeader>
+              <Form onSubmit={sendVerificationToken}>
                 <ModalBody className="flex flex-col gap-4 text-center">
                   {uiElements.loading && (
                     <div className="bg-primary rounded-lg py-2 px-4">
@@ -166,7 +178,7 @@ const EmailVerificationModalButton = ({ property }) => {
                     variant="light"
                     // isDisabled={tokenState.tokenMsg !== ""}
                     isDisabled={tokenState.tokenMsg}
-                    onClick={getEmailVerificationMail}
+                    onClick={getVerificationToken}
                   >
                     Get {tokenState.tokenSent && "Another"} Token
                   </Button>
@@ -195,4 +207,4 @@ const EmailVerificationModalButton = ({ property }) => {
   );
 };
 
-export default EmailVerificationModalButton;
+export default VerificationModalButton;

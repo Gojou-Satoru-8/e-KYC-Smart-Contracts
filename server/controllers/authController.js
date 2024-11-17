@@ -10,6 +10,7 @@ const Verifier = require("../models/Verifier");
 const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
 const sendMail = require("../utils/sendMail");
+const sendSMS = require("../utils/sendSMS");
 
 const userTypeToModel = {
   User,
@@ -532,7 +533,6 @@ exports.mailEmailVerificationToken = catchAsync(async (req, res, next) => {
       )}`,
     });
   } catch (err) {
-    await req.user.discardPublicKeyResetToken();
     throw new AppError(500, err.message);
   }
 });
@@ -544,6 +544,7 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
   if (!token) throw new AppError(404, "Missing Token");
 
   const decoded = jwt.verify(token, process.env.JWT_SHARE_KEY);
+  console.log("Decoded Token: ", decoded);
 
   if (decoded.purpose !== "verification" || decoded.type !== "email")
     throw new AppError(406, "Invalid Token purpose");
@@ -558,9 +559,67 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
 
   if (!verifiedUser) throw new AppError(404, "Invalid Token");
 
-  res
-    .status(200)
-    .json({ status: "success", message: "User verified successfully", user: verifiedUser });
+  res.status(200).json({
+    status: "success",
+    message: "User's E-mail verified successfully",
+    user: verifiedUser,
+  });
 });
 
 // ROUTE: /api/users/phone-verification-token [GET]
+exports.smsPhoneVerificationToken = catchAsync(async (req, res, next) => {
+  // This is different from mailing password-reset token, as this exclusively requires the user to be logged in
+  // Hence we already have the user document, thus this requires a GET request.
+  const payload = { id: req.user.id, purpose: "verification", type: "phone" };
+  const token = jwt.sign(payload, process.env.JWT_SHARE_KEY, {
+    expiresIn: process.env.JWT_SHARE_KEY_EXPIRES_IN,
+  });
+  console.log("PHONE VERIFICATION TOKEN: ", token);
+
+  const message = `Enter this token to verify your phone number:\n${token}`;
+  try {
+    await sendSMS({
+      recipient: req.user.phoneNumber,
+      msgBody: message,
+    });
+    console.log("SMS sent successfully");
+    res.status(200).json({
+      status: "success",
+      message: `Phone verification token sent via sms to your phone number ${new Date().toLocaleString(
+        "en-UK",
+        { timeZone: "Asia/Kolkata" }
+      )}`,
+    });
+  } catch (err) {
+    throw new AppError(500, err.message);
+  }
+});
+
+// ROUTE: /api/users/phone-verification-token [POST]
+exports.verifyPhone = catchAsync(async (req, res, next) => {
+  const { token } = req.body;
+
+  if (!token) throw new AppError(404, "Missing Token");
+
+  const decoded = jwt.verify(token, process.env.JWT_SHARE_KEY);
+  console.log("Decoded Token: ", decoded);
+
+  if (decoded.purpose !== "verification" || decoded.type !== "phone")
+    throw new AppError(406, "Invalid Token purpose");
+
+  if (decoded.id !== req.user.id) throw new AppError(406, "Invalid Token! Not meant for this user");
+
+  const verifiedUser = await User.findByIdAndUpdate(
+    req.user.id,
+    { isPhoneNumberVerified: true },
+    { new: true, runValidators: true }
+  );
+
+  if (!verifiedUser) throw new AppError(404, "Invalid Token");
+
+  res.status(200).json({
+    status: "success",
+    message: "User's phone number verified successfully",
+    user: verifiedUser,
+  });
+});

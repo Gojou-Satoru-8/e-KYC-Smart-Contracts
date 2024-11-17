@@ -49,7 +49,6 @@ const UserSchema = new mongoose.Schema(
     photo: { type: String, default: "/src/assets/account-image.png" },
     publicKey: { type: String, select: false },
     createdAt: { type: Date, default: Date.now },
-    isVerified: { type: Boolean, default: false },
     password: {
       type: String,
       required: [true, "Password is a required field"],
@@ -74,6 +73,9 @@ const UserSchema = new mongoose.Schema(
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
+UserSchema.virtual("isVerified").get(function () {
+  return this.isEmailVerified && this.isPhoneNumberVerified;
+});
 UserSchema.index({ email: 1 });
 // MONGOOSE METHODS:
 UserSchema.methods.isPasswordCorrect = async function (password) {

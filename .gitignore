@@ -25,3 +25,4 @@ dist-ssr
 # Program files:
 server/temp/*
 server/documents/*
+server/.env

@@ -145,7 +145,7 @@ const ChangePasswordModalButton = () => {
   return (
     <>
       {/* <Button onPress={onOpen}>Run Code</Button> */}
-      <Button color="danger" variant="flat" onPress={onOpen}>
+      <Button color="danger" variant="flat" onPress={onOpen} className="text-wrap">
         Update Password
       </Button>
       <Modal
