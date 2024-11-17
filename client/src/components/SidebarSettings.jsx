@@ -1,37 +1,44 @@
-import { Divider, Button } from "@nextui-org/react";
+import { Divider, Button, Listbox, ListboxItem } from "@nextui-org/react";
+import IconWrapper from "./IconWrapper";
 import { Link } from "react-router-dom";
 import HomeIcon from "../assets/home.png";
 
 const SidebarSettings = ({ styles, children }) => {
   return (
-    <div
+    <aside
       className={
         styles === "default" ? "app-sidebar rounded-tr-xl shadow-large min-w-[20%]" : styles
       }
     >
-      <div className="h-[20%] mx-4 my-10 flex flex-col">
-        <div className="py-2 text-center">
-          <Link to="/">
-            <Button
-              color="secondary"
-              variant="light"
-              className="w-[80%]"
-              startContent={<img src={HomeIcon}></img>}
-            >
-              Home
-            </Button>
-          </Link>
-        </div>
-        {/* <div className="py-2">
-          <Link to="/"></Link>
-        </div> */}
-      </div>
+      <Listbox
+        aria-label="User Menu"
+        className="my-2 gap-0"
+        itemClasses={{
+          base: "px-3 first:rounded-t-medium last:rounded-b-medium rounded-none gap-3 h-12 ",
+        }}
+      >
+        <ListboxItem
+          key="home"
+          href="/"
+          variant="bordered"
+          color="success"
+          startContent={
+            <IconWrapper className="bg-primary/10 text-primary">
+              <img src={HomeIcon} alt="Home" />
+            </IconWrapper>
+          }
+        >
+          Home
+        </ListboxItem>
+      </Listbox>
+
       <Divider />
-      <div className="h-[70%] mx-2 my-6 flex flex-col justify-start gap-4 overflow-auto">
-        <div className="text-center">
-          <h1>Sections</h1>
-        </div>
-        {/* <div className="my-2 text-center">
+      {children && (
+        <div className="h-[70%] mx-2 my-6 flex flex-col justify-start gap-4 overflow-auto">
+          <div className="text-center">
+            <h1>Sections</h1>
+          </div>
+          {/* <div className="my-2 text-center">
           <Button
             size="sm"
             variant="flat"
@@ -42,9 +49,10 @@ const SidebarSettings = ({ styles, children }) => {
             Clear Tags
           </Button>
           </div> */}
-        {children}
-      </div>
-    </div>
+          {children}
+        </div>
+      )}
+    </aside>
   );
 };
 

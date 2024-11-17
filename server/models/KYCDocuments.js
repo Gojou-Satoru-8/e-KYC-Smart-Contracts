@@ -33,7 +33,7 @@ const KYCDocumentSchema = new mongoose.Schema(
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-KYCDocumentSchema.virtual("is_verified").get(function () {
+KYCDocumentSchema.virtual("isVerified").get(function () {
   return this.status !== "Pending";
 });
 const KYCDocument = mongoose.model("KYCDocument", KYCDocumentSchema);

@@ -18,6 +18,7 @@ const statusColor = { Pending: "warning", Approved: "success", Rejected: "danger
 const HomePage = ({ userType }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const authState = useSelector((state) => state.auth);
   const documentsState = useSelector((state) => state.documents);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -34,7 +35,7 @@ const HomePage = ({ userType }) => {
     // (_blank option is not strictly necessary)
     navigate(`/${userType.toLowerCase()}s/documents/${id}`);
   };
-  /*
+
   const handleDeleteDocument = async (id) => {
     const response = await fetch(`http://localhost:3000/api/documents/${id}`, {
       method: "DELETE",
@@ -56,80 +57,87 @@ const HomePage = ({ userType }) => {
     }
     dispatch(documentsActions.deleteNote(id));
   };
-  */
+
+  // let title = `You have ${!documentsToDisplay.length ? "no" : documentsToDisplay.length} Documents`;
 
   return (
     <MainLayout>
       <SidebarHome styles={"default"} isDeleting={isDeleting} setIsDeleting={setIsDeleting} />
       <Content
-        title={
-          documentsToDisplay?.length === 0
-            ? "You have no documents"
-            : `You have ${documentsToDisplay.length} Documents`
-        }
+        title={`You have ${
+          !documentsToDisplay.length ? "no" : documentsToDisplay.length
+        } Documents`}
       >
         {/* {isLoading && <h1 className="mt-10 text-center">Loading your notes...</h1>} */}
-        <div className="mt-10 grid xl:grid-cols-4 md:grid-cols-[repeat(3,31%)] sm:grid-cols-[repeat(2,45%)] grid-cols-1 justify-center gap-8">
-          {documentsToDisplay?.length > 0 &&
-            documentsToDisplay.map((document) => (
-              <Card
-                className="w-full hover:-translate-y-2 "
-                classNames={{
-                  base: "w-full h-56 hover:-translate-y-2 border hover:border-purple-300 overflow-scroll",
-                }}
-                // isBlurred
-                isFooterBlurred
-                isPressable
-                onPress={() => handleViewDoc(document._id)}
-                key={document._id}
-              >
-                <CardHeader className="justify-center">
-                  <div className="flex gap-5">
-                    <div className="flex flex-col gap-1 items-start justify-center">
-                      <h3 className="text-medium font-semibold leading-none text-default-600">
-                        {document.type}
-                      </h3>
+        {userType === "User" && !authState.entity?.isVerified ? (
+          <div className="bg-warning rounded">
+            <h1 className="mt-10 text-center">
+              You must verify your E-mail and Phone Number before submitting documents
+            </h1>
+          </div>
+        ) : (
+          <div className="mt-10 grid xl:grid-cols-4 md:grid-cols-[repeat(3,31%)] sm:grid-cols-[repeat(2,45%)] grid-cols-1 justify-center gap-8">
+            {documentsToDisplay?.length > 0 &&
+              documentsToDisplay.map((document) => (
+                <Card
+                  className="w-full hover:-translate-y-2 "
+                  classNames={{
+                    base: "w-full h-56 hover:-translate-y-2 border hover:border-purple-300 overflow-scroll",
+                  }}
+                  // isBlurred
+                  isFooterBlurred
+                  isPressable
+                  onPress={() => handleViewDoc(document._id)}
+                  key={document._id}
+                >
+                  <CardHeader className="justify-center">
+                    <div className="flex gap-5">
+                      <div className="flex flex-col gap-1 items-start justify-center">
+                        <h3 className="text-medium font-semibold leading-none text-default-600">
+                          {document.type}
+                        </h3>
+                      </div>
                     </div>
-                  </div>
-                </CardHeader>
-                <CardBody>
-                  <ScrollShadow hideScrollBar size={35} offset={5}>
-                    <div className="text-sm">{document.status}</div>
-                    <div className="text-sm">{document.submittedAt}</div>
-                    <div className="text-sm">{document.verifiedAt}</div>
-                  </ScrollShadow>
-                </CardBody>
-                {/* <CardFooter className="absolute bg-white/30 bottom-0 border-t-1 border-zinc-100/50 z-10 justify-between"> */}
-                <CardFooter className="py-1 overflow-auto">
-                  {isDeleting ? (
-                    <div className="w-full flex flex-wrap gap-2 justify-end m-auto">
-                      <Button
-                        className={""}
-                        color="danger"
-                        radius="full"
-                        size="sm"
-                        variant="ghost"
-                        // onClick={() => handleDeleteDocument(document._id)}
-                      >
-                        {/* <img src={CloseIcon} alt="" /> */}
-                        Delete
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="w-full flex flex-wrap gap-2 justify-center m-auto">
-                      <Chip
-                        key={document._id}
-                        variant="shadow"
-                        color={statusColor[document.status]}
-                      >
-                        {document.status}
-                      </Chip>
-                    </div>
-                  )}
-                </CardFooter>
-              </Card>
-            ))}
-        </div>
+                  </CardHeader>
+                  <CardBody>
+                    <ScrollShadow hideScrollBar size={35} offset={5}>
+                      <div className="text-sm">{document.status}</div>
+                      <div className="text-sm">{document.submittedAt}</div>
+                      <div className="text-sm">{document.verifiedAt}</div>
+                    </ScrollShadow>
+                  </CardBody>
+                  {/* <CardFooter className="absolute bg-white/30 bottom-0 border-t-1 border-zinc-100/50 z-10 justify-between"> */}
+                  <CardFooter className="pb-3 overflow-auto">
+                    {isDeleting && document.status !== "Approved" ? (
+                      <div className="w-full flex flex-wrap gap-2 justify-end m-auto">
+                        <Button
+                          className={""}
+                          color="danger"
+                          radius="full"
+                          size="sm"
+                          variant="ghost"
+                          // onClick={() => handleDeleteDocument(document._id)}
+                        >
+                          {/* <img src={CloseIcon} alt="" /> */}
+                          Delete
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="w-full flex flex-wrap gap-2 justify-center m-auto">
+                        <Chip
+                          key={document._id}
+                          variant="shadow"
+                          color={statusColor[document.status]}
+                        >
+                          {document.status}
+                        </Chip>
+                      </div>
+                    )}
+                  </CardFooter>
+                </Card>
+              ))}
+          </div>
+        )}
       </Content>
     </MainLayout>
   );
