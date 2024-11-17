@@ -20,8 +20,9 @@ const validatePassword = (currentPassword, newPassword) => {
     errors.push("Your new password can't match your current one");
   if (newPassword.length < 8 || newPassword.length > 15)
     errors.push("Set a password between 8 and 15 characters");
-  // if (!password.search(/(%|_|#)/))
-  //   errors.push("Password must include a special character like %, _, #");
+  if (newPassword.search(/(%|_|#|!|@|\$|%|\^|&|\*)/) === -1)
+    // All special characters from the number row
+    errors.push("Password must include a special character like %, _, #, ! etc.");
   return [...errors];
 };
 
@@ -112,12 +113,12 @@ const ChangePasswordModalButton = () => {
 
       if (response.status === 401) {
         dispatch(authActions.unsetEntity());
-        dispatch(documentsActions.clearAll()());
+        dispatch(documentsActions.clearAll());
         navigate("/login", { state: { message: "Time Out! Please log-in again" } });
         return;
       }
 
-      if (!response.ok || data.status === "fail") {
+      if (!response.ok || data.status !== "success") {
         setTimeNotification({ error: data.message }, 1.5);
         return;
       }

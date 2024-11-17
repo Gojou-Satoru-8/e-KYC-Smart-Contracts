@@ -16,5 +16,8 @@ router.route("/").get(authController.getCurrentUser).patch(authController.update
 router.route("/generate-key-token").get(authController.mailPublicKeyResetToken);
 router.route("/update-key").post(authController.updatePublicKey);
 router.route("/update-password").post(authController.updatePassword("User"));
+router
+  .route("/update-pfp")
+  .post(authController.uploadPfp, authController.resizeUserPhoto, authController.updatePfp);
 
 module.exports = router;

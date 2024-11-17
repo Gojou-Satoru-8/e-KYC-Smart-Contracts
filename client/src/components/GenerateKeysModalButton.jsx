@@ -28,7 +28,7 @@ function generateKeyPair() {
   return { publicKeyPem, privateKeyPem };
 }
 
-const GenerateKeysModal = () => {
+const GenerateKeysModalButton = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const authState = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -301,4 +301,4 @@ const GenerateKeysModal = () => {
   );
 };
 
-export default GenerateKeysModal;
+export default GenerateKeysModalButton;

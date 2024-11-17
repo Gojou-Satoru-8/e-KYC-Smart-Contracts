@@ -487,17 +487,19 @@ exports.resizeUserPhoto = (req, res, next) => {
     .resize(500, 500)
     .toFormat("jpeg")
     .jpeg({ quality: 90 })
-    .toFile(path.resolve(__dirname, "..", "public/user-images", req.file.filename));
+    .toFile(path.resolve(__dirname, "..", "dist", "src", "user-images", req.file.filename));
   next();
 };
 
 exports.updatePfp = catchAsync(async (req, res, next) => {
-  console.log("User: ", req.file); // Has filename attribute crucially.
+  console.log("User Photo: ", req.file); // Has filename attribute crucially.
 
   const updatedUser = await User.findByIdAndUpdate(
     req.user.id,
     { photo: req.file.filename },
     { new: true, runValidators: true }
   );
-  res.status(200).json({ status: "success", message: "Pfp Changed Successfully" });
+  res
+    .status(200)
+    .json({ status: "success", message: "Pfp Changed Successfully", user: updatedUser });
 });

@@ -43,7 +43,7 @@ const usePopulateDocuments = (entityType) => {
         dispatch(documentsActions.setDocuments({ documents: data.documents }));
         // Issue of data.documents turning to undefined needs to be isolated
       } catch (err) {
-        alert(err.message);
+        alert("Unable to download documents");
       }
     };
     fetchAllDocuments();

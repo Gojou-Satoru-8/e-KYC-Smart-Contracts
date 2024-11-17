@@ -14,7 +14,8 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { authActions, documentsActions } from "../store";
 import ChangePasswordModalButton from "./ChangePasswordModalButton";
-import GenerateKeysModal from "./GenerateKeysModal";
+import GenerateKeysModalButton from "./GenerateKeysModalButton";
+import UpdatePfpModalButton from "./UpdatePfpModalButton";
 import { MailIcon } from "../assets/MailIcon";
 import { UserIcon } from "../assets/UserIcon";
 import PhoneIcon from "../assets/PhoneIcon";
@@ -115,14 +116,19 @@ const SettingsAccount = () => {
         <CardHeader className="flex-col justify-center pt-10 px-20 gap-4 text-center">
           {!isEditing && (
             <>
-              <Avatar
+              {/* <Avatar
                 size="lg"
                 // isBordered
                 // color="secondary"
                 // showFallback
                 src={userInfo.photo}
                 // name={userInfo.name}
-              ></Avatar>
+              ></Avatar> */}
+              <UpdatePfpModalButton
+                photoSrc={`http://localhost:3000/src/user-images/${
+                  userInfo.photo
+                }?t=${new Date().getTime()}`}
+              />
               <h3 className="text-3xl text-center">{userInfo.name}</h3>
             </>
           )}
@@ -238,9 +244,9 @@ const SettingsAccount = () => {
             )}
           </div>
           <Divider />
-          <div className="flex flex-row justify-center gap-8 m-auto">
+          <div className="flex flex-row justify-center gap-2 m-auto">
             <ChangePasswordModalButton />
-            <GenerateKeysModal />
+            <GenerateKeysModalButton />
           </div>
         </CardFooter>
       </Card>
