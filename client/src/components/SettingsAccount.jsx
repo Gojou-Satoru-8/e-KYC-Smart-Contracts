@@ -16,6 +16,7 @@ import { authActions, documentsActions } from "../store";
 import ChangePasswordModalButton from "./ChangePasswordModalButton";
 import GenerateKeysModalButton from "./GenerateKeysModalButton";
 import UpdatePfpModalButton from "./UpdatePfpModalButton";
+import EmailVerificationModalButton from "./EmailVerificationModalButton";
 import { MailIcon } from "../assets/MailIcon";
 import { UserIcon } from "../assets/UserIcon";
 import PhoneIcon from "../assets/PhoneIcon";
@@ -38,6 +39,8 @@ const SettingsAccount = () => {
     name: authState.entity?.name,
     phoneNumber: authState.entity?.phoneNumber,
     photo: authState.entity?.photo,
+    isEmailVerified: authState.entity?.isEmailVerified,
+    isPhoneNumberVerified: authState.entity?.isPhoneNumberVerified,
   });
 
   console.log("User Info:", userInfo);
@@ -165,6 +168,7 @@ const SettingsAccount = () => {
             startContent={
               <MailIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0 m-auto" />
             }
+            endContent={!userInfo.isEmailVerified && <EmailVerificationModalButton />}
             required
           ></Input>
           <Input
@@ -180,6 +184,13 @@ const SettingsAccount = () => {
             classNames={{ input: "text-center" }}
             startContent={
               <PhoneIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0 m-auto" />
+            }
+            endContent={
+              !userInfo.isPhoneNumberVerified && (
+                <Button size="sm" color="warning">
+                  Verify
+                </Button>
+              )
             }
             required
           ></Input>

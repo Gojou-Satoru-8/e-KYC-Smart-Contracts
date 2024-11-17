@@ -19,5 +19,8 @@ router.route("/update-password").post(authController.updatePassword("User"));
 router
   .route("/update-pfp")
   .post(authController.uploadPfp, authController.resizeUserPhoto, authController.updatePfp);
-
+router
+  .route("/email-verification-token")
+  .get(authController.mailEmailVerificationToken)
+  .post(authController.verifyEmail);
 module.exports = router;

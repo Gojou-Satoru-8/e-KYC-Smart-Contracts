@@ -44,6 +44,8 @@ const UserSchema = new mongoose.Schema(
       maxLength: [20, "Name must not exceed 20 characters"],
     },
     phoneNumber: { type: String, required: [true, "User must provide a phone number"] },
+    isEmailVerified: { type: Boolean, default: false },
+    isPhoneNumberVerified: { type: Boolean, default: false },
     photo: { type: String, default: "/src/assets/account-image.png" },
     publicKey: { type: String, select: false },
     createdAt: { type: Date, default: Date.now },

@@ -397,7 +397,7 @@ exports.mailPublicKeyResetToken = catchAsync(async (req, res, next) => {
   // if (!user) throw new AppError(404, `No user associated with the email`);
   // const {user} = req;  // Use this instead of above lines
   const token = await req.user.generatePublicKeyResetToken();
-  const message = `Enter this token to reset your password:\n${token}`;
+  const message = `Enter this token to re-generate your keys:\n${token}`;
   try {
     await sendMail({
       recipient: ["ankushbhowmikf12@gmail.com", "itsmeankush893@outlook.com", req.user.email],
@@ -503,3 +503,64 @@ exports.updatePfp = catchAsync(async (req, res, next) => {
     .status(200)
     .json({ status: "success", message: "Pfp Changed Successfully", user: updatedUser });
 });
+
+// NOTE: Email and Phone-Number Verification for User:
+
+// ROUTE: /api/users/email-verification-token [GET]
+exports.mailEmailVerificationToken = catchAsync(async (req, res, next) => {
+  // This is different from mailing password-reset token, as this exclusively requires the user to be logged in
+  // Hence we already have the user document, thus this requires a GET request.
+  const payload = { id: req.user.id, purpose: "verification", type: "email" };
+  const token = jwt.sign(payload, process.env.JWT_SHARE_KEY, {
+    expiresIn: process.env.JWT_SHARE_KEY_EXPIRES_IN,
+  });
+  console.log("EMAIL VERIFICATION TOKEN: ", token);
+
+  const message = `Enter this token to verify your E-mail:\n${token}`;
+  try {
+    await sendMail({
+      recipient: ["ankushbhowmikf12@gmail.com", "itsmeankush893@outlook.com", req.user.email],
+      subject: "E-mail verification Token (Valid for 10 minutes)",
+      mailBody: message,
+    });
+    console.log("Mail sent successfully");
+    res.status(200).json({
+      status: "success",
+      message: `E-mail verification token sent to your email at ${new Date().toLocaleString(
+        "en-UK",
+        { timeZone: "Asia/Kolkata" }
+      )}`,
+    });
+  } catch (err) {
+    await req.user.discardPublicKeyResetToken();
+    throw new AppError(500, err.message);
+  }
+});
+
+// ROUTE: /api/users/email-verification-token  [POST]
+exports.verifyEmail = catchAsync(async (req, res, next) => {
+  const { token } = req.body;
+
+  if (!token) throw new AppError(404, "Missing Token");
+
+  const decoded = jwt.verify(token, process.env.JWT_SHARE_KEY);
+
+  if (decoded.purpose !== "verification" || decoded.type !== "email")
+    throw new AppError(406, "Invalid Token purpose");
+
+  if (decoded.id !== req.user.id) throw new AppError(406, "Invalid Token! Not meant for this user");
+
+  const verifiedUser = await User.findByIdAndUpdate(
+    req.user.id,
+    { isEmailVerified: true },
+    { new: true, runValidators: true }
+  );
+
+  if (!verifiedUser) throw new AppError(404, "Invalid Token");
+
+  res
+    .status(200)
+    .json({ status: "success", message: "User verified successfully", user: verifiedUser });
+});
+
+// ROUTE: /api/users/phone-verification-token [GET]
