@@ -36,5 +36,6 @@ const KYCDocumentSchema = new mongoose.Schema(
 KYCDocumentSchema.virtual("isVerified").get(function () {
   return this.status !== "Pending";
 });
+
 const KYCDocument = mongoose.model("KYCDocument", KYCDocumentSchema);
 module.exports = KYCDocument;

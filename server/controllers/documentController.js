@@ -10,7 +10,7 @@ const { verifySignature } = require("../utils/crypto");
 
 // ROUTE: /api/documents/all [GET] - Restricted to verifiers only:
 exports.getAllDocuments = catchAsync(async (req, res, next) => {
-  const documents = await KYCDocument.find().populate("user");
+  const documents = await KYCDocument.find().populate("user verifiedBy");
   console.log(documents);
 
   if (documents.length === 0) throw new AppError(404, "No documents in the DB");
@@ -26,7 +26,7 @@ exports.getAllDocuments = catchAsync(async (req, res, next) => {
 exports.getDocumentsByUser = catchAsync(async (req, res, next) => {
   // This middleware will be preceded by checkAuth, and will only give info from KYCDocument schema, ie only the path
   // and the actual file content (which stays encrypted on-disk) isn't served.
-  const documents = await KYCDocument.find({ user: req.user._id });
+  const documents = await KYCDocument.find({ user: req.user._id }).populate("verifiedBy");
   console.log(documents);
 
   if (documents.length === 0) throw new AppError(404, "No documents submitted by the user yet");
@@ -38,6 +38,7 @@ exports.getDocumentsByUser = catchAsync(async (req, res, next) => {
   });
 });
 
+/*
 // ROUTE: /api/documents/:id [POST]
 exports.getDocument = catchAsync(async (req, res, next) => {
   const document = await KYCDocument.findById(req.params.id);
@@ -52,6 +53,26 @@ exports.getDocument = catchAsync(async (req, res, next) => {
   res.setHeader("Content-Disposition", 'attachment; filename="document.pdf"');
   // Step 3: Send the decrypted buffer
   res.send(decryptedBuffer);
+});
+*/
+
+// ROUTE: /api/documents/:id [DELETE]
+exports.deleteDocument = catchAsync(async (req, res, next) => {
+  // const { id } = req.params;
+
+  const docToDelete = await KYCDocument.findById(req.params.id);
+  console.log("DOCUMENT TO DELETE: ", docToDelete);
+
+  if (!docToDelete) throw new AppError(404, "No such document with the provided ID");
+  if (docToDelete.status === "Approved")
+    throw new AppError(406, "Cannot delete an approved document");
+
+  await docToDelete.deleteOne();
+  // res.status(204).json({
+  res.status(204).json({
+    status: "success",
+    message: "Document deleted successfully",
+  });
 });
 
 const upload = multer({
@@ -195,7 +216,6 @@ exports.postDocument = catchAsync(async (req, res, next) => {
 });
 
 // ROUTE: /api/dpcuments/:id [GET]
-
 exports.downloadDocumentById = catchAsync(async (req, res, next) => {
   // const {id} = req.params;
 
@@ -243,7 +263,7 @@ exports.updateStatus = catchAsync(async (req, res, next) => {
 
   const updatedDocument = await KYCDocument.findByIdAndUpdate(
     req.params.id,
-    { ...req.body },
+    { ...req.body, verifiedAt: Date.now(), verifiedBy: req.verifier._id },
     { runValidators: true, new: true }
   );
   if (!updatedDocument) throw new AppError(404, "No document with the provided ID");

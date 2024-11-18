@@ -64,6 +64,10 @@ const documentsSlice = createSlice({
         state.tags = extractTags(state.documents);
       }
     },
+    deleteDocument: (state, action) => {
+      state.documents = state.documents.filter((doc) => doc._id !== action.payload);
+      state.tags = extractTags(state.documents);
+    },
     clearAll: (state, action) => {
       state.documents = [];
       state.tags = [];

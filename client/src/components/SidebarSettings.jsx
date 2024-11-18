@@ -1,7 +1,7 @@
 import { Divider, Button, Listbox, ListboxItem } from "@nextui-org/react";
 import IconWrapper from "./IconWrapper";
 import { Link } from "react-router-dom";
-import HomeIcon from "../assets/home.png";
+import HomeIcon from "../assets/HomeIcon";
 
 const SidebarSettings = ({ styles, children }) => {
   return (
@@ -23,8 +23,8 @@ const SidebarSettings = ({ styles, children }) => {
           variant="bordered"
           color="success"
           startContent={
-            <IconWrapper className="bg-primary/10 text-primary">
-              <img src={HomeIcon} alt="Home" />
+            <IconWrapper className="bg-success/10 text-success">
+              <HomeIcon />
             </IconWrapper>
           }
         >

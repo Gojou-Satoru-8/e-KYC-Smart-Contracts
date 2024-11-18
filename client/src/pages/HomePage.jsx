@@ -55,10 +55,15 @@ const HomePage = ({ userType }) => {
 
       return;
     }
-    dispatch(documentsActions.deleteNote(id));
+    dispatch(documentsActions.deleteDocument(id));
   };
 
   // let title = `You have ${!documentsToDisplay.length ? "no" : documentsToDisplay.length} Documents`;
+  // Setting up cancel deletion on hitting ESC key
+  document.onkeydown = (e) => {
+    // console.log(e);
+    if (isDeleting && e.key === "Escape") setIsDeleting(false);
+  };
 
   return (
     <MainLayout>
@@ -80,30 +85,34 @@ const HomePage = ({ userType }) => {
             {documentsToDisplay?.length > 0 &&
               documentsToDisplay.map((document) => (
                 <Card
-                  className="w-full hover:-translate-y-2 "
+                  // className="w-full hover:-translate-y-2 "
                   classNames={{
-                    base: "w-full h-56 hover:-translate-y-2 border hover:border-purple-300 overflow-scroll",
+                    base: "w-full h-52 hover:-translate-y-2 border hover:border-purple-300 overflow-scroll",
                   }}
                   // isBlurred
-                  isFooterBlurred
+                  // isFooterBlurred
                   isPressable
                   onPress={() => handleViewDoc(document._id)}
                   key={document._id}
                 >
                   <CardHeader className="justify-center">
-                    <div className="flex gap-5">
-                      <div className="flex flex-col gap-1 items-start justify-center">
-                        <h3 className="text-medium font-semibold leading-none text-default-600">
-                          {document.type}
-                        </h3>
-                      </div>
+                    <div className="flex flex-col gap-1 items-start justify-center">
+                      <h3 className="text-medium font-semibold leading-none text-default-600">
+                        {document.type}
+                      </h3>
                     </div>
                   </CardHeader>
                   <CardBody>
                     <ScrollShadow hideScrollBar size={35} offset={5}>
-                      <div className="text-sm">{document.status}</div>
-                      <div className="text-sm">{document.submittedAt}</div>
-                      <div className="text-sm">{document.verifiedAt}</div>
+                      <ul className="list-disc pl-5">
+                        <li className="text-sm">{document.status}</li>
+                        <li className="text-sm">
+                          Submitted{" "}
+                          {new Date(document.submittedAt).toLocaleString("en-UK", {
+                            timeZone: "Asia/Kolkata",
+                          })}
+                        </li>
+                      </ul>
                     </ScrollShadow>
                   </CardBody>
                   {/* <CardFooter className="absolute bg-white/30 bottom-0 border-t-1 border-zinc-100/50 z-10 justify-between"> */}
@@ -115,10 +124,9 @@ const HomePage = ({ userType }) => {
                           color="danger"
                           radius="full"
                           size="sm"
-                          variant="ghost"
-                          // onClick={() => handleDeleteDocument(document._id)}
+                          variant="light"
+                          onClick={() => handleDeleteDocument(document._id)}
                         >
-                          {/* <img src={CloseIcon} alt="" /> */}
                           Delete
                         </Button>
                       </div>

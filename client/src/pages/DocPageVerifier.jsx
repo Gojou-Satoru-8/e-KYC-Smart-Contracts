@@ -151,14 +151,27 @@ const DocPageVerifier = () => {
 
       <Content title={`${document?.type} Verification`}>
         <Card className="mt-10">
-          <CardHeader className="flex-col">
-            <h1 className="text-xl text-center">Status: {document?.status}</h1>
-            <h2 className="text-lg text-center">
-              Submitted on:{" "}
-              {new Date(document?.submittedAt).toLocaleString("en-UK", {
-                timezone: "Asia/Kolkata",
-              })}
-            </h2>
+          {/* <CardHeader className="flex-col"> */}
+          {/* NOTE: Settings flex-col on CardHeader centers content including lists & their bullet points */}
+          <CardHeader>
+            <ul className="list-disc px-10">
+              <li>Status: {document?.status}</li>
+              <li>
+                Submitted{" "}
+                {new Date(document?.submittedAt).toLocaleString("en-UK", {
+                  timeZone: "Asia/Kolkata",
+                })}
+              </li>
+              {document?.verifiedAt && (
+                <li>
+                  Verified{" "}
+                  {new Date(document?.verifiedAt).toLocaleString("en-UK", {
+                    timeZone: "Asia/Kolkata",
+                  })}
+                </li>
+              )}
+              {document?.verifiedBy && <li>Verified By {document.verifiedBy?.name}</li>}
+            </ul>
           </CardHeader>
           <CardBody>
             {pdfUrl && (
@@ -173,11 +186,14 @@ const DocPageVerifier = () => {
           <Card>
             <CardHeader className="flex-col justify-center pt-10 px-20 gap-4 text-center">
               <Avatar
-                size="lg"
+                // size="lg"
+                className="w-24 h-24"
                 // isBordered
                 // color="secondary"
-                // showFallback
-                src={userInfo?.photo}
+                showFallback
+                src={`http://localhost:3000/src/user-images/${
+                  userInfo?.photo
+                }?t=${new Date().getTime()}`}
                 // name={authState.entity.name}
               ></Avatar>
               <h3 className="text-3xl text-center">User Information</h3>
@@ -190,8 +206,7 @@ const DocPageVerifier = () => {
                 label="Email"
                 labelPlacement="outside"
                 value={userInfo?.email}
-                isDisabled // readOnly means non-editable, isDisabled is non-editable and faded
-                // variant="underlined"
+                readOnly
                 classNames={{ input: "text-center" }}
                 startContent={
                   <MailIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0 m-auto" />
@@ -204,8 +219,7 @@ const DocPageVerifier = () => {
                 label="Phone Number"
                 labelPlacement="outside"
                 value={userInfo?.phoneNumber}
-                isDisabled // readOnly means non-editable, isDisabled is non-editable and faded
-                // variant="underlined"
+                readOnly
                 classNames={{ input: "text-center" }}
                 startContent={
                   <PhoneIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0 m-auto" />
@@ -218,22 +232,19 @@ const DocPageVerifier = () => {
                 label="User Name"
                 labelPlacement="outside"
                 value={userInfo?.username}
-                isDisabled
-                // variant="underlined"
+                readOnly
                 classNames={{ input: "text-center" }}
                 startContent={<UserIcon className="m-auto" />}
                 // endContent={<Button size="sm">Edit</Button>}
                 required
               />
-
               <Input
                 type="name"
                 name="name"
                 label="Name"
                 labelPlacement="outside"
                 value={userInfo?.name}
-                isDisabled
-                // variant="underlined"
+                readOnly
                 classNames={{ input: "text-center" }}
                 required
               />

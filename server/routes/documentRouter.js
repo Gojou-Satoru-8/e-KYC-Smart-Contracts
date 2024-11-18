@@ -21,7 +21,10 @@ router
     documentController.encryptDocumentAndSave,
     documentController.postDocument
   );
-router.route("/:id").get(documentController.downloadDocumentById);
+router
+  .route("/:id")
+  .get(documentController.downloadDocumentById)
+  .delete(authController.restrictTo("User"), documentController.deleteDocument);
 
 router
   .route("/share")

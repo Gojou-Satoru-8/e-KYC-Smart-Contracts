@@ -33,14 +33,19 @@ const SettingsAccount = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState(false);
   const [error, setError] = useState("");
+  // NOTE: (Important) Only those fields are included below as state-values, which are actually
+  // edited here so as to keep track and reset them to authState's values upon cancel.
+  // For now, only email and username are editable; changing password, photo or generating new key-pairs
+  // are handled by separate Modals. Thus, use userInfo state values for email and username, use authState
+  // for rest.
   const [userInfo, setUserInfo] = useState({
-    email: authState.entity?.email,
+    // email: authState.entity?.email,
     username: authState.entity?.username,
     name: authState.entity?.name,
-    phoneNumber: authState.entity?.phoneNumber,
-    photo: authState.entity?.photo,
-    isEmailVerified: authState.entity?.isEmailVerified,
-    isPhoneNumberVerified: authState.entity?.isPhoneNumberVerified,
+    // phoneNumber: authState.entity?.phoneNumber,
+    // photo: authState.entity?.photo,
+    // isEmailVerified: authState.entity?.isEmailVerified,
+    // isPhoneNumberVerified: authState.entity?.isPhoneNumberVerified,
   });
 
   console.log("User Info:", userInfo);
@@ -51,10 +56,10 @@ const SettingsAccount = () => {
 
   const handleCancelUpdate = (e) => {
     setUserInfo({
-      email: authState.entity?.email,
+      // email: authState.entity?.email,
       username: authState.entity?.username,
       name: authState.entity?.name,
-      phoneNumber: authState.entity?.phoneNumber,
+      // phoneNumber: authState.entity?.phoneNumber,
     });
     setIsEditing(false);
   };
@@ -158,7 +163,7 @@ const SettingsAccount = () => {
             name="email"
             label="Email"
             labelPlacement="outside"
-            value={userInfo.email}
+            value={authState.entity?.email}
             onChange={handleChangeInfo}
             readOnly
             isDisabled={isEditing} // readOnly means non-editable, isDisabled is non-editable and faded
@@ -177,7 +182,7 @@ const SettingsAccount = () => {
             name="phoneNumber"
             label="Phone Number"
             labelPlacement="outside"
-            value={userInfo.phoneNumber}
+            value={authState.entity?.phoneNumber}
             onChange={handleChangeInfo}
             readOnly
             isDisabled={isEditing} // readOnly means non-editable, isDisabled is non-editable and faded

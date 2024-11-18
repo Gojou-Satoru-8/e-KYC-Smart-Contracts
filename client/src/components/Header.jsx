@@ -28,9 +28,7 @@ const Header = () => {
       const { entityType } = authState;
       const response = await fetch(
         `http://localhost:3000/api/${entityType.toLowerCase()}s/logout`,
-        {
-          credentials: "include",
-        }
+        { credentials: "include" }
       );
       if (!response.ok) {
         alert("Unable to log out! Server Issue");
@@ -82,16 +80,19 @@ const Header = () => {
               <DropdownTrigger>
                 <Avatar
                   isBordered
+                  showFallback
                   as="button"
                   className="transition-transform"
                   color="secondary"
-                  name={authState.user?.name
-                    .split(" ")
-                    .map((segment) => segment.at(0))
-                    .join("")}
+                  // name={authState.user?.name
+                  //   .split(" ")
+                  //   .map((segment) => segment.at(0))
+                  //   .join("")}
                   // Here we're taking initials of each segment of name
                   size="sm"
-                  src={authState.user?.profilePic}
+                  src={`http://localhost:3000/src/user-images/${
+                    authState.entity?.photo
+                  }?t=${new Date().getTime()}`}
                 />
               </DropdownTrigger>
               <DropdownMenu aria-label="Profile Actions" variant="solid">

@@ -135,6 +135,7 @@ const DocPageUser = () => {
           radius="full"
           variant="solid"
           size="lg"
+          className="w-fit m-auto"
           //   itemClasses={{
           //     item: [
           //       "data-[current=true]:bg-success data-[current=true]:rounded-xl transition-colors",
@@ -147,7 +148,7 @@ const DocPageUser = () => {
             isCurrent={document?.status === "Pending"}
             classNames={{
               item: [
-                "data-[current=true]:bg-warning data-[current=true]:rounded-xl transition-colors px-2",
+                "data-[current=true]:text-warning data-[current=true]:rounded-xl transition-colors px-2",
               ],
             }}
           >
@@ -158,7 +159,7 @@ const DocPageUser = () => {
               isCurrent={document?.status === "Approved"}
               classNames={{
                 item: [
-                  "data-[current=true]:bg-success data-[current=true]:rounded-xl transition-colors px-2",
+                  "data-[current=true]:text-success data-[current=true]:rounded-xl transition-colors px-2",
                 ],
               }}
             >
@@ -170,7 +171,7 @@ const DocPageUser = () => {
               isCurrent={document?.status === "Rejected"}
               classNames={{
                 item: [
-                  "data-[current=true]:bg-danger data-[current=true]:rounded-xl transition-colors px-2",
+                  "data-[current=true]:text-danger data-[current=true]:rounded-xl transition-colors px-2",
                 ],
               }}
             >
@@ -178,8 +179,38 @@ const DocPageUser = () => {
             </BreadcrumbItem>
           )}
         </Breadcrumbs>
+        <Card className="my-5">
+          <CardHeader className="justify-center">
+            <h3 className="text-2xl font-semibold leading-none text-default-600">
+              {document?.type}
+            </h3>
+          </CardHeader>
+          <CardBody className="mb-4">
+            <ul className="list-disc px-10">
+              <li>{document?.status}</li>
+              <li>
+                Submitted{" "}
+                {new Date(document?.submittedAt).toLocaleString("en-UK", {
+                  timeZone: "Asia/Kolkata",
+                })}
+              </li>
+              {document?.verifiedAt && (
+                <li>
+                  Verified{" "}
+                  {new Date(document?.verifiedAt).toLocaleString("en-UK", {
+                    timeZone: "Asia/Kolkata",
+                  })}
+                </li>
+              )}
+              {document?.verifiedBy && <li>Verified By {document.verifiedBy?.name}</li>}
+              {document?.rejectionReason && (
+                <li>Reason for Rejection: {document.rejectionReason}</li>
+              )}
+            </ul>
+          </CardBody>
+        </Card>
         {pdfUrl && (
-          <div className="w-full aspect-[1/1.4] h-[1000px] py-10">
+          <div className="w-full aspect-[1/1.4] h-[1000px] my-5">
             <iframe src={pdfUrl} className="w-full h-full border-0" title="Document" />
           </div>
         )}

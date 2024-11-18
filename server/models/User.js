@@ -76,6 +76,7 @@ const UserSchema = new mongoose.Schema(
 UserSchema.virtual("isVerified").get(function () {
   return this.isEmailVerified && this.isPhoneNumberVerified;
 });
+
 UserSchema.index({ email: 1 });
 // MONGOOSE METHODS:
 UserSchema.methods.isPasswordCorrect = async function (password) {

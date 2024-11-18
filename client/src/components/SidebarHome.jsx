@@ -1,6 +1,6 @@
 import { Divider, Button, Listbox, ListboxItem, ListboxSection } from "@nextui-org/react";
-import { Link } from "react-router-dom";
-import HomeIcon from "../assets/home.png";
+// import { Link } from "react-router-dom";
+// import HomeIcon from "../assets/home.png";
 // import { GearIcon } from "../assets/GearIcon";
 // import SettingsIcon from "../assets/settings.png";
 import SettingsIcon from "../assets/SettingsIcon";
@@ -80,12 +80,12 @@ const SidebarHome = ({ isDeleting, setIsDeleting, styles }) => {
               variant="flat"
               onClick={toggleDeleting}
               startContent={
-                <IconWrapper className="bg-primary/10 text-primary">
+                <IconWrapper className="bg-danger/10 text-danger">
                   <DeleteIcon />
                 </IconWrapper>
               }
             >
-              {isDeleting ? "Cancel" : "Delete Notes"}
+              {isDeleting ? "Cancel" : "Delete Docs"}
             </ListboxItem>
           )}
         </ListboxSection>
