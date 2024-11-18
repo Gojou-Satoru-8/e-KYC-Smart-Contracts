@@ -171,6 +171,9 @@ const DocPageVerifier = () => {
                 </li>
               )}
               {document?.verifiedBy && <li>Verified By {document.verifiedBy?.name}</li>}
+              {document?.rejectionReason && (
+                <li>Reason for Rejection: {document.rejectionReason}</li>
+              )}
             </ul>
           </CardHeader>
           <CardBody>

@@ -105,6 +105,9 @@ const HomePage = ({ userType }) => {
                   <CardBody>
                     <ScrollShadow hideScrollBar size={35} offset={5}>
                       <ul className="list-disc pl-5">
+                        {userType === "Verifier" && (
+                          <li className="text-sm">User: {document.user.name}</li>
+                        )}
                         <li className="text-sm">{document.status}</li>
                         <li className="text-sm">
                           Submitted{" "}

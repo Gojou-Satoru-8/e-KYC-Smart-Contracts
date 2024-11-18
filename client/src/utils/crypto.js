@@ -36,18 +36,18 @@ export const signDocument = async function (privateKeyPem, documentFile) {
   return util.encode64(signature);
 };
 
-// TODO: Must be converted to decrypt document:
-export const encryptDocument = async function (privateKey, documentFile) {
-  const fileBuffer = await documentFile.arrayBuffer();
-  console.log("File-Buffer: ", fileBuffer);
+// TODO: Must be converted to decrypt document (No use as of now)
+// export const encryptDocument = async function (privateKey, documentFile) {
+//   const fileBuffer = await documentFile.arrayBuffer();
+//   console.log("File-Buffer: ", fileBuffer);
 
-  const encrypted = privateKey.encrypt(
-    util.binary.raw.encode(new Uint8Array(fileBuffer)),
-    "RSA-OAEP",
-    {
-      md: md.sha256.create(),
-      mgf1: mgf.mgf1.create(md.sha256.create()),
-    }
-  );
-  return encrypted;
-};
+//   const encrypted = privateKey.encrypt(
+//     util.binary.raw.encode(new Uint8Array(fileBuffer)),
+//     "RSA-OAEP",
+//     {
+//       md: md.sha256.create(),
+//       mgf1: mgf.mgf1.create(md.sha256.create()),
+//     }
+//   );
+//   return encrypted;
+// };

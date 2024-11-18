@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 
 const BlockchainRecordSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: [true, "Record must be associated with a User"],
-  },
+  // user: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: "User",
+  //   required: [true, "Record must be associated with a User"],
+  // },
   document: {
     type: mongoose.Schema.ObjectId,
     ref: "KYCDocument",

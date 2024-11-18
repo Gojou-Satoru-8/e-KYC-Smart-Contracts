@@ -3,6 +3,7 @@ const multer = require("multer");
 const crypto = require("crypto");
 const fsPromises = require("fs/promises");
 const path = require("path");
+const User = require("../models/User");
 const KYCDocument = require("../models/KYCDocuments");
 const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
@@ -104,15 +105,17 @@ exports.testDocumentUpload = (req, res, next) => {
 exports.verifyAuthenticity = catchAsync(async (req, res, next) => {
   // const { signature } = req.body;
   // const { file } = req;
+  // NOTE: As publicKey has select: false, we need to requery the database
+  const user = await User.findById(req.user.id).select("+publicKey");
   console.log("VERIFY AUTHENTICITY MIDDLEWARE:");
-  console.log("USER: ", req.user);
+  console.log("USER (w/ publicKey): ", user);
   console.log("FILE: ", req.file);
   console.log("SIGNATURE: ", req.body.signature);
 
   const isValid = verifySignature(
     req.file.buffer, // Original document
     req.body.signature, // Base64 signature from client
-    req.user.publicKey // User's public key PEM
+    user.publicKey // User's public key PEM
   );
 
   if (!isValid) {

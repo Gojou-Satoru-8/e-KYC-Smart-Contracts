@@ -130,7 +130,7 @@ const DocPageUser = () => {
     <MainLayout>
       <SidebarDoc styles={"default"} />
 
-      <Content>
+      <Content title={`${document?.type} Verification`}>
         <Breadcrumbs
           radius="full"
           variant="solid"
@@ -180,14 +180,14 @@ const DocPageUser = () => {
           )}
         </Breadcrumbs>
         <Card className="my-5">
-          <CardHeader className="justify-center">
+          {/* <CardHeader className="justify-center">
             <h3 className="text-2xl font-semibold leading-none text-default-600">
               {document?.type}
             </h3>
-          </CardHeader>
+          </CardHeader> */}
           <CardBody className="mb-4">
             <ul className="list-disc px-10">
-              <li>{document?.status}</li>
+              <li>Status: {document?.status}</li>
               <li>
                 Submitted{" "}
                 {new Date(document?.submittedAt).toLocaleString("en-UK", {
