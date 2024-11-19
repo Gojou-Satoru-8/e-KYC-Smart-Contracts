@@ -37,5 +37,12 @@ KYCDocumentSchema.virtual("isVerified").get(function () {
   return this.status !== "Pending";
 });
 
+KYCDocumentSchema.virtual("blockchainRecord", {
+  ref: "BlockchainRecord",
+  localField: "_id",
+  foreignField: "document",
+  justOne: true,
+});
+
 const KYCDocument = mongoose.model("KYCDocument", KYCDocumentSchema);
 module.exports = KYCDocument;

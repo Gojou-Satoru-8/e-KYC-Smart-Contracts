@@ -7,11 +7,13 @@ const User = require("../models/User");
 const KYCDocument = require("../models/KYCDocuments");
 const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
-const { verifySignature } = require("../utils/crypto");
+const { verifySignature, decryptDocument } = require("../utils/crypto");
+const { approveOnChain, checkApprovedOnChain } = require("../blockchain/setup");
+const BlockchainRecord = require("../models/BlockchainRecord");
 
 // ROUTE: /api/documents/all [GET] - Restricted to verifiers only:
 exports.getAllDocuments = catchAsync(async (req, res, next) => {
-  const documents = await KYCDocument.find().populate("user verifiedBy");
+  const documents = await KYCDocument.find().populate("user verifiedBy blockchainRecord");
   console.log(documents);
 
   if (documents.length === 0) throw new AppError(404, "No documents in the DB");
@@ -27,7 +29,9 @@ exports.getAllDocuments = catchAsync(async (req, res, next) => {
 exports.getDocumentsByUser = catchAsync(async (req, res, next) => {
   // This middleware will be preceded by checkAuth, and will only give info from KYCDocument schema, ie only the path
   // and the actual file content (which stays encrypted on-disk) isn't served.
-  const documents = await KYCDocument.find({ user: req.user._id }).populate("verifiedBy");
+  const documents = await KYCDocument.find({ user: req.user._id }).populate(
+    "verifiedBy blockchainRecord"
+  );
   console.log(documents);
 
   if (documents.length === 0) throw new AppError(404, "No documents submitted by the user yet");
@@ -230,22 +234,8 @@ exports.downloadDocumentById = catchAsync(async (req, res, next) => {
   console.log(document);
 
   const documentPath = path.join(__dirname, "..", "documents", document.path);
-  const encryptedBuffer = await fsPromises.readFile(documentPath);
 
-  // Extract components
-  const iv = encryptedBuffer.slice(0, 16); // First 16 bytes is IV
-  const authTag = encryptedBuffer.slice(-16); // Last 16 bytes is auth tag
-  const encryptedContent = encryptedBuffer.slice(16, -16); // Everything in between
-
-  const key = Buffer.from(process.env.PLATFORM_SECRET_KEY, "hex");
-
-  // Create decipher
-  const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);
-  decipher.setAuthTag(authTag);
-
-  // Decrypt
-  const decryptedBuffer = Buffer.concat([decipher.update(encryptedContent), decipher.final()]);
-
+  const decryptedBuffer = await decryptDocument(documentPath);
   // Set headers for PDF
   res.setHeader("Content-Type", "application/pdf");
   // res.setHeader("Content-Disposition", 'attachment; filename="document.pdf"');
@@ -273,6 +263,11 @@ exports.updateStatus = catchAsync(async (req, res, next) => {
 
   // console.log(updatedDocument);
 
+  if (updatedDocument.status === "Approved") {
+    req.document = updatedDocument;
+    return next();
+  }
+
   res.status(200).json({
     status: "success",
     message: "Document Status updated successfully",
@@ -280,18 +275,57 @@ exports.updateStatus = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.deployApprovedDocOnChain = catchAsync(async (req, res, next) => {
+  // This middleware follows updateStatus Middleware, if the status was set to "Approved"
+  if (!req.document) throw new AppError(404, "Missing Document on Request");
+  // Highly unlikely to be triggered
+  const documentPath = path.join(__dirname, "..", "documents", req.document.path);
+  const decryptedBuffer = await decryptDocument(documentPath);
+  const documentContentsHex = `0x${decryptedBuffer.toString("hex")}`;
+  const transactionDetails = await approveOnChain(req.document._id.toString(), documentContentsHex);
+
+  const blockchainRecord = await BlockchainRecord.create({
+    document: req.document._id,
+    ...transactionDetails,
+    // documentHash: transaction.documentHash,
+    // recordedAt: transaction.record,
+    // transactionHash: transaction.transactionHash,
+  });
+  return res.status(201).json({
+    status: "success",
+    message: "Document Approved and Record persisted in Blockchain",
+    document: req.document,
+    blockchainRecord,
+  });
+});
+
+exports.retrieveApprovedFromChain = catchAsync(async (req, res, next) => {
+  // const { id } = req.params;
+  // const {type} = req.query;  // Allows usage of both documentId or hash of documentId as :id in URL
+  if (!req.params.id) throw new AppError(406, "Missing Document ID");
+  console.log(req.params);
+  console.log(req.query.type);
+
+  const results = await checkApprovedOnChain(req.params.id, { type: req.query.type });
+
+  res.status(200).json({ status: "success", message: "Record retrieved successfully", ...results });
+});
 // ROUTE: /api/documents/share/ [POST] - Restricted to User only
 exports.generateShareCode = catchAsync(async (req, res, next) => {
-  const { organizationId, documentId } = req.body;
+  const { organizationEmail, documentId } = req.body;
 
   if (!documentId) throw new AppError(404, "Missing Document ID");
-  if (!organizationId) throw new AppError(404, "Missing Organization ID");
+  if (!organizationEmail) throw new AppError(404, "Missing Organization Email");
 
   const document = await KYCDocument.findById(documentId);
   if (!document.status === "Approved")
     throw new AppError(403, "Document is not approved! Thus cannot be shared");
 
-  const payload = { userId: req.user.id, organizationId: organizationId, documentId: documentId };
+  const payload = {
+    userId: req.user.id,
+    organizationEmail: organizationEmail,
+    documentId: documentId,
+  };
   const token = jwt.sign(payload, process.env.JWT_SHARE_KEY, {
     expiresIn: process.env.JWT_SHARE_KEY_EXPIRES_IN,
   });
@@ -309,10 +343,13 @@ exports.getSharedDocument = catchAsync(async (req, res, next) => {
   const decoded = jwt.verify(token, process.env.JWT_SHARE_KEY);
   console.log("Original payload inside share token/code: ", decoded);
 
-  if (decoded.organizationId !== req.organization.id)
+  if (decoded.organizationEmail !== req.organization.email)
     throw new AppError(403, "Forbidden Access to this Organization.");
 
-  const document = await KYCDocument.findOne({ _id: decoded.documentId, user: decoded.userId });
+  const document = await KYCDocument.findOne({
+    _id: decoded.documentId,
+    user: decoded.userId,
+  }).populate("user verifiedBy blockchainRecord");
   // NOTE: Here it is possible to get document by id only, but as a safety parameter, we include the userId so that
   // a user can only share his own document, even if he gets someone else's document.
 

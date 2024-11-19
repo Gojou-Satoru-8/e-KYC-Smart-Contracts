@@ -1,4 +1,6 @@
 const crypto = require("crypto");
+const fsPromises = require("fs/promises");
+const AppError = require("./AppError");
 
 exports.verifySignature = (document, signature, publicKeyPem) => {
   try {
@@ -26,7 +28,31 @@ exports.createDocumentHash = (document) => {
     return hash;
   } catch (err) {
     console.log("Hashing Error: ", err);
-    throw err;
+    throw new AppError(500, `Hashing Error: ${err.message}`);
+  }
+};
+
+exports.decryptDocument = async (documentPath) => {
+  try {
+    const encryptedBuffer = await fsPromises.readFile(documentPath);
+
+    // Extract components
+    const iv = encryptedBuffer.slice(0, 16); // First 16 bytes is IV
+    const authTag = encryptedBuffer.slice(-16); // Last 16 bytes is auth tag
+    const encryptedContent = encryptedBuffer.slice(16, -16); // Everything in between
+
+    const key = Buffer.from(process.env.PLATFORM_SECRET_KEY, "hex");
+
+    // Create decipher
+    const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);
+    decipher.setAuthTag(authTag);
+
+    // Decrypt
+    const decryptedBuffer = Buffer.concat([decipher.update(encryptedContent), decipher.final()]);
+    return decryptedBuffer;
+  } catch (err) {
+    console.log("Error in Document Decryption: ", err);
+    throw new AppError(500, `Error in Document Decryption: ${err.message}`);
   }
 };
 

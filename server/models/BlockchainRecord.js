@@ -11,11 +11,12 @@ const BlockchainRecordSchema = new mongoose.Schema({
     ref: "KYCDocument",
     required: [true, "Record must be associated with a KYC Document of a certain User"],
   },
-  blockchainHash: { type: String, required: [true, "Blockchain hash is a required field"] },
-  // Document Hash stored on blockchain
-  transactionId: { type: String, required: [true, "Transaction ID is a required field"] },
+  documentIdHash: { type: String, required: [true, "Document ID Hash is a required field"] },
+  documentHash: { type: String, required: [true, "Document hash is a required field"] },
+  blockHash: { type: String, required: [true, "Block hash is a required field"] },
+  transactionHash: { type: String, required: [true, "Transaction Hash is a required field"] },
   recordedAt: { type: Date, default: Date.now },
 });
 
-const BlockchainRecord = mongoose.Model("BlockchainRecord", BlockchainRecordSchema);
+const BlockchainRecord = mongoose.model("BlockchainRecord", BlockchainRecordSchema);
 module.exports = BlockchainRecord;

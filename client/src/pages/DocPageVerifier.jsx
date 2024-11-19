@@ -15,6 +15,7 @@ import {
   ModalFooter,
   ModalContent,
   useDisclosure,
+  Snippet,
 } from "@nextui-org/react";
 import MainLayout from "../components/MainLayout";
 import SidebarDoc from "../components/SidebarDoc";
@@ -32,6 +33,10 @@ const DocPageVerifier = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [pdfUrl, setPdfUrl] = useState(null);
   const [uiElements, setUIElements] = useState({ loading: false, error: "", message: "" });
+  const [recordFromChainVerification, setRecordFromChainVerification] = useState({
+    documentHash: "",
+    verifiedAt: "",
+  });
   const rejectReasonRef = useRef(null);
 
   const document = useSelector((state) => {
@@ -45,6 +50,7 @@ const DocPageVerifier = () => {
   // const documentsState = useSelector((state) => state.documents);
   // const document = documentsState.documents.find((doc) => doc?._id === params.id);
   console.log("Current document: ", document);
+  const blockchainRecord = document?.blockchainRecord;
   console.log("document?.user:", document?.user);
   const userInfo = document?.user || {
     email: "",
@@ -116,6 +122,8 @@ const DocPageVerifier = () => {
       }
       body.rejectionReason = rejectReasonRef.current.value;
     }
+
+    setTimeNotification({ loading: true });
     try {
       const response = await fetch(`http://localhost:3000/api/documents/all/${document?._id}`, {
         method: "PATCH",
@@ -145,9 +153,60 @@ const DocPageVerifier = () => {
       console.log(err.message);
     }
   };
+
+  const fetchChainVerifyRecord = async (URL) => {
+    try {
+      console.log(URL);
+      const response = await fetch(URL, { credentials: "include" });
+      console.log(response);
+      const data = await response.json();
+      console.log(data);
+
+      if (response.status === 401) {
+        dispatch(authActions.unsetEntity());
+        dispatch(documentsActions.clearAll());
+        // navigate("/login", { state: { message: "Time Out! Please log in again" } });
+        return;
+      }
+      if (!response.ok || data.status !== "success") {
+        setTimeNotification({ error: data.message }, 1.5);
+        return;
+      }
+
+      setTimeNotification({ message: data.message });
+      setRecordFromChainVerification({
+        documentHash: data.documentHash,
+        verifiedAt: data.verifiedAt,
+      });
+    } catch (err) {
+      console.log(err);
+      setTimeNotification({ error: err.message });
+    }
+  };
+  const handleVerifyRecord = async () => {
+    setTimeNotification({ loading: true });
+    fetchChainVerifyRecord(`http://localhost:3000/api/documents/verify/${document.id}`);
+  };
+
   return (
     <MainLayout>
-      <SidebarDoc styles={"default"} />
+      <SidebarDoc styles={"default"}>
+        {uiElements.loading && (
+          <div className="bg-primary rounded py-2 px-4">
+            <p>Saving! Please wait</p>
+          </div>
+        )}
+        {uiElements.error && (
+          <div className="bg-danger rounded py-2 px-4">
+            <p>{uiElements.error}</p>
+          </div>
+        )}
+        {uiElements.message && (
+          <div className="bg-success rounded py-2 px-4">
+            <p>{uiElements.message}</p>
+          </div>
+        )}
+      </SidebarDoc>
 
       <Content title={`${document?.type} Verification`}>
         <Card className="mt-10">
@@ -184,6 +243,56 @@ const DocPageVerifier = () => {
             )}
           </CardBody>
         </Card>
+
+        {blockchainRecord && (
+          <Card className="my-5">
+            <CardHeader className="justify-center mt-2">
+              <h3 className="text-2xl font-semibold leading-none text-default-600">
+                Blockchain Record
+              </h3>
+            </CardHeader>
+            <CardBody className="">
+              <ul className="list-disc px-10 flex flex-col gap-2">
+                <li>
+                  Transaction Hash: <Snippet size="sm">{blockchainRecord.transactionHash}</Snippet>
+                </li>
+                <li>
+                  Document ID Hash: <Snippet size="sm">{blockchainRecord.documentIdHash}</Snippet>
+                </li>
+                <li>
+                  Document Hash: <Snippet size="sm">{blockchainRecord.documentHash}</Snippet>
+                </li>
+                <li>
+                  Block Hash: <Snippet size="sm">{blockchainRecord.blockHash}</Snippet>
+                </li>
+                <li>
+                  Recorded At{" "}
+                  {new Date(blockchainRecord.recordedAt).toLocaleString("en-UK", {
+                    timeZone: "Asia/Kolkata",
+                  })}
+                </li>
+              </ul>
+            </CardBody>
+            <CardFooter className="flex-col justify-center mb-2 gap-5">
+              <Button onClick={handleVerifyRecord}>Auto Verify Record</Button>
+
+              {recordFromChainVerification.documentHash && (
+                <ul className="list-disc px-10 flex flex-col gap-2 my-5">
+                  <li>
+                    Document Hash:{" "}
+                    <Snippet size="sm">{recordFromChainVerification.documentHash}</Snippet>
+                  </li>
+                  <li>
+                    Recorded At{" "}
+                    {new Date(recordFromChainVerification.verifiedAt).toLocaleString("en-UK", {
+                      timeZone: "Asia/Kolkata",
+                    })}
+                  </li>
+                </ul>
+              )}
+            </CardFooter>
+          </Card>
+        )}
 
         <div className="mt-10 m-auto">
           <Card>
@@ -256,7 +365,7 @@ const DocPageVerifier = () => {
               <CardFooter className="flex flex-col gap-5">
                 {uiElements.loading && (
                   <div className="bg-primary rounded py-2 px-4">
-                    <p>Saving! Please wait</p>
+                    <p>Processing! Please wait</p>
                   </div>
                 )}
                 {uiElements.error && (

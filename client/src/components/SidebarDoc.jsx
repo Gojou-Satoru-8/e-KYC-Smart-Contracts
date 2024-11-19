@@ -55,7 +55,7 @@ const SidebarDoc = ({ styles, children }) => {
       {children && (
         <div className="h-[50%] mx-2 my-6 flex flex-col justify-start gap-4 overflow-auto">
           <div className="text-center">
-            <h1>Actions</h1>
+            <h1>Notifications</h1>
           </div>
           {/* <div className="my-2 text-center">
           <Button

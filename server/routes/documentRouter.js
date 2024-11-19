@@ -8,7 +8,11 @@ router.use(authController.checkAuth);
 router.route("/all").get(authController.restrictTo("Verifier"), documentController.getAllDocuments);
 router
   .route("/all/:id")
-  .patch(authController.restrictTo("Verifier"), documentController.updateStatus);
+  .patch(
+    authController.restrictTo("Verifier"),
+    documentController.updateStatus,
+    documentController.deployApprovedDocOnChain
+  );
 
 router
   .route("/")
@@ -32,4 +36,6 @@ router
 router
   .route("/share/:token")
   .get(authController.restrictTo("Organization"), documentController.getSharedDocument);
+
+router.route("/verify/:id").get(documentController.retrieveApprovedFromChain);
 module.exports = router;
