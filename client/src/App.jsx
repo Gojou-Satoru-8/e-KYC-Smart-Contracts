@@ -6,12 +6,13 @@ import useGetCurrentUser from "./hooks/useGetCurrentUser";
 import ErrorPage from "./pages/ErrorPage";
 import RootLayout from "./pages/RootLayout";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import HomePage from "./pages/HomePage";
+import HomePageUser from "./pages/HomePageUser";
 import HomePageOrganization from "./pages/HomePageOrganization";
 import DocPageUser from "./pages/DocPageUser";
 import DocPageVerifier from "./pages/DocPageVerifier";
 import NewDocPage from "./pages/NewDocPage";
 import UserSettingsPage from "./pages/UserSettingsPage";
+import HomePageVerifier from "./pages/HomePageVerifier";
 
 const router = createBrowserRouter([
   {
@@ -22,7 +23,7 @@ const router = createBrowserRouter([
       {
         path: "/users",
         children: [
-          { index: true, element: <HomePage userType={"User"} /> },
+          { index: true, element: <HomePageUser /> },
           { path: "/users/documents/:id", element: <DocPageUser /> },
           { path: "/users/new-document", element: <NewDocPage /> },
           { path: "/users/settings", element: <UserSettingsPage /> },
@@ -35,7 +36,7 @@ const router = createBrowserRouter([
       {
         path: "/verifiers",
         children: [
-          { index: true, element: <HomePage userType={"Verifier"} /> },
+          { index: true, element: <HomePageVerifier /> },
           { path: "/verifiers/documents/:id", element: <DocPageVerifier /> },
         ],
       },

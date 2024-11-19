@@ -5,15 +5,16 @@ import { Divider, Button, Listbox, ListboxItem, ListboxSection } from "@nextui-o
 // import SettingsIcon from "../assets/settings.png";
 import SettingsIcon from "../assets/SettingsIcon";
 import { useDispatch, useSelector } from "react-redux";
-import CloseIcon from "../assets/close (1).png";
+// import CloseIcon from "../assets/close (1).png";
 import { documentsActions } from "../store";
 import BookIcon from "../assets/BookIcon";
 import IconWrapper from "./IconWrapper";
-import DeleteIcon from "../assets/DeleteIcon";
+import { DeleteIcon, CloseIcon } from "../assets/DeleteCloseIcon";
 
 const statusColor = { Pending: "warning", Approved: "success", Rejected: "danger" };
 
 const SidebarHome = ({ isDeleting, setIsDeleting, styles }) => {
+  // Used by both
   const dispatch = useDispatch();
   const authState = useSelector((state) => state.auth);
   const documentsState = useSelector((state) => state.documents);
@@ -127,7 +128,7 @@ const SidebarHome = ({ isDeleting, setIsDeleting, styles }) => {
 
                   {selectedTags?.includes(tag) && (
                     <div
-                      className="hover:bg-red-400 rounded-lg min-w-3"
+                      className="hover:bg-red-800 rounded-lg min-w-3"
                       onClick={(e) => {
                         e.stopPropagation(); // Stopping the "click" event here, otherwise it will trigger the onClick
                         // event-handler of the parent element Button
@@ -135,7 +136,10 @@ const SidebarHome = ({ isDeleting, setIsDeleting, styles }) => {
                         dispatch(documentsActions.removeSelectedTags(tag));
                       }}
                     >
-                      <img src={CloseIcon} alt="" width={"15"} />
+                      {/* <img src={CloseIcon} alt="" width={"15"} /> */}
+                      <IconWrapper className="bg-danger/10 text-danger">
+                        <CloseIcon />
+                      </IconWrapper>
                     </div>
                   )}
                 </Button>

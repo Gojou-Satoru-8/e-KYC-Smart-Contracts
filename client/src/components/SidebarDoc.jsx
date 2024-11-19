@@ -3,11 +3,13 @@ import { Link } from "react-router-dom";
 import HomeIcon from "../assets/HomeIcon";
 // import SettingsIcon from "../assets/settings.png";
 import SettingsIcon from "../assets/SettingsIcon";
+import BookIcon from "../assets/BookIcon";
 import IconWrapper from "./IconWrapper";
 import { useSelector } from "react-redux";
 
 const SidebarDoc = ({ styles, children }) => {
   const authState = useSelector((state) => state.auth);
+  const isVerifiedUser = authState.entityType === "User" && authState.entity?.isVerified;
   return (
     <aside
       className={
@@ -23,6 +25,22 @@ const SidebarDoc = ({ styles, children }) => {
           base: "px-3 first:rounded-t-medium last:rounded-b-medium rounded-none gap-3 h-12 ",
         }}
       >
+        {isVerifiedUser && (
+          <ListboxItem
+            key="new_document"
+            href="/users/new-document"
+            variant="faded"
+            color="success"
+            startContent={
+              <IconWrapper className="bg-success/10 text-success">
+                <BookIcon className="text-lg" />
+              </IconWrapper>
+            }
+          >
+            {/* <Link to="/users/new-document">New Document</Link> */}
+            New Document
+          </ListboxItem>
+        )}
         <ListboxItem
           key="home"
           href="/"

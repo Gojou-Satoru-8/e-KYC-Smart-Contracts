@@ -1,21 +1,17 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import MainLayout from "../components/MainLayout";
 import SidebarHome from "../components/SidebarHome";
 import Content from "../components/Content";
-// import { useEffect, useState } from "react";
 import { Card, CardHeader, CardBody, Button, CardFooter, Chip } from "@nextui-org/react";
 import { ScrollShadow } from "@nextui-org/scroll-shadow";
-
-// import usePopulateDocumentsTodocumentsToDisplay from "../hooks/usePopulateDocumentsTodocumentsToDisplay";
-// import { useRedirectIfNotAuthenticated } from "../hooks/checkAuthHooks";
 import { authActions, documentsActions } from "../store";
-// import CloseIcon from "../assets/close.png";
 
 const statusColor = { Pending: "warning", Approved: "success", Rejected: "danger" };
 
-const HomePage = ({ userType }) => {
+// const HomePageUser = ({ userType }) => {
+const HomePageUser = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const authState = useSelector((state) => state.auth);
@@ -33,7 +29,8 @@ const HomePage = ({ userType }) => {
     // window.location.assign(`http://localhost:3000/api/documents/${id}`); // Opens in same tab
     // window.open(`http://localhost:3000/api/documents/${id}`, "_blank"); // Opens in a new tab
     // (_blank option is not strictly necessary)
-    navigate(`/${userType.toLowerCase()}s/documents/${id}`);
+    // navigate(`/${userType.toLowerCase()}s/documents/${id}`);
+    navigate(`/users/documents/${id}`);
   };
 
   const handleDeleteDocument = async (id) => {
@@ -44,10 +41,10 @@ const HomePage = ({ userType }) => {
     // const data = await response.json();
     // console.log(data);
     if (response.status === 401) {
+      navigate("/login", { state: { message: "Time Out! Please login again" } });
       dispatch(authActions.unsetEntity());
       // dispatch(documentsActions.setNotes({ notes: [] }));
       dispatch(documentsActions.clearAll());
-      navigate("/login", { state: { message: "Time Out! Please login again" } });
       return;
     }
     if (response.status !== 204) {
@@ -74,10 +71,10 @@ const HomePage = ({ userType }) => {
         } Documents`}
       >
         {/* {isLoading && <h1 className="mt-10 text-center">Loading your notes...</h1>} */}
-        {userType === "User" && !authState.entity?.isVerified ? (
+        {!authState.entity?.isVerified ? (
           <div className="bg-warning rounded">
             <h1 className="mt-10 text-center">
-              You must verify your E-mail and Phone Number before submitting documents
+              You must verify your E-mail or Phone Number before submitting documents
             </h1>
           </div>
         ) : (
@@ -87,7 +84,7 @@ const HomePage = ({ userType }) => {
                 <Card
                   // className="w-full hover:-translate-y-2 "
                   classNames={{
-                    base: "w-full h-52 hover:-translate-y-2 border hover:border-purple-300 overflow-scroll",
+                    base: "w-full h-56 hover:-translate-y-2 border hover:border-purple-300 overflow-scroll",
                   }}
                   // isBlurred
                   // isFooterBlurred
@@ -95,26 +92,33 @@ const HomePage = ({ userType }) => {
                   onPress={() => handleViewDoc(document._id)}
                   key={document._id}
                 >
-                  <CardHeader className="justify-center">
+                  <CardHeader className="justify-center mb-1">
                     <div className="flex flex-col gap-1 items-start justify-center">
-                      <h3 className="text-medium font-semibold leading-none text-default-600">
+                      <h3 className="text-xl font-semibold leading-none text-default-600">
                         {document.type}
                       </h3>
                     </div>
                   </CardHeader>
                   <CardBody>
                     <ScrollShadow hideScrollBar size={35} offset={5}>
-                      <ul className="list-disc pl-5">
-                        {userType === "Verifier" && (
-                          <li className="text-sm">User: {document.user.name}</li>
-                        )}
-                        <li className="text-sm">{document.status}</li>
+                      <ul className="list-disc pl-5 flex flex-col gap-1">
                         <li className="text-sm">
                           Submitted{" "}
                           {new Date(document.submittedAt).toLocaleString("en-UK", {
                             timeZone: "Asia/Kolkata",
                           })}
                         </li>
+                        {document?.verifiedAt && (
+                          <li className="text-sm">
+                            Verified{" "}
+                            {new Date(document?.verifiedAt).toLocaleString("en-UK", {
+                              timeZone: "Asia/Kolkata",
+                            })}
+                          </li>
+                        )}
+                        {document?.verifiedBy && (
+                          <li className="text-sm">Verified By {document.verifiedBy?.name}</li>
+                        )}
                       </ul>
                     </ScrollShadow>
                   </CardBody>
@@ -154,4 +158,4 @@ const HomePage = ({ userType }) => {
   );
 };
 
-export default HomePage;
+export default HomePageUser;
