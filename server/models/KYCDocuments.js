@@ -11,8 +11,9 @@ const KYCDocumentSchema = new mongoose.Schema(
     type: {
       type: String,
       enum: {
-        values: ["Passport", "Voter ID", "Driver License", "Aadhar"],
-        message: "Document be any of Passport | VoterID | Driver License | Aadhar",
+        values: ["Passport", "Voter ID", "Driver License", "Aadhar", "PAN", "NRC", "PRC"],
+        message:
+          "Document be any of Passport | VoterID | Driver License | Aadhar | PAN | NRC | PRC",
       },
       required: [true, "Document must have a type"],
     },

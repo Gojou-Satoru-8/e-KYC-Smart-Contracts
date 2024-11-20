@@ -1,5 +1,5 @@
 import { Divider, Button, Listbox, ListboxItem } from "@nextui-org/react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import HomeIcon from "../assets/HomeIcon";
 // import SettingsIcon from "../assets/settings.png";
 import SettingsIcon from "../assets/SettingsIcon";
@@ -7,9 +7,15 @@ import BookIcon from "../assets/BookIcon";
 import IconWrapper from "./IconWrapper";
 import { useSelector } from "react-redux";
 
+// NOTE: This Sidebar component is for use with DocPageUser, DocPageVerifier and NewDocPage
 const SidebarDoc = ({ styles, children }) => {
   const authState = useSelector((state) => state.auth);
   const isVerifiedUser = authState.entityType === "User" && authState.entity?.isVerified;
+  const location = useLocation();
+
+  const newDocumentPage = location.pathname.includes("/new-document");
+  // console.log(location.pathname, newDocumentPage);
+
   return (
     <aside
       className={
@@ -25,7 +31,7 @@ const SidebarDoc = ({ styles, children }) => {
           base: "px-3 first:rounded-t-medium last:rounded-b-medium rounded-none gap-3 h-12 ",
         }}
       >
-        {isVerifiedUser && (
+        {isVerifiedUser && !newDocumentPage && (
           <ListboxItem
             key="new_document"
             href="/users/new-document"

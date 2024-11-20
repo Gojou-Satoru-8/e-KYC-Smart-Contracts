@@ -8,8 +8,8 @@ import SidebarDoc from "../components/SidebarDoc";
 import Content from "../components/Content";
 import { authActions, documentsActions } from "../store";
 import { signDocument } from "../utils/crypto";
-const docTypes = ["Passport", "Voter ID", "Driver License", "Aadhar"];
-const DocPage = ({ isNew }) => {
+const docTypes = ["Passport", "Voter ID", "Driver License", "Aadhar", "PAN", "NRC", "PRC"];
+const NewDocPage = () => {
   // console.log("New Note:", isNew);
 
   const dispatch = useDispatch();
@@ -18,8 +18,7 @@ const DocPage = ({ isNew }) => {
 
   const [file, setFile] = useState(null);
   const [docType, setDocType] = useState("Passport"); // ["Passport", "Voter ID", "Driver License", "Aadhar"]
-  console.log({ docType });
-  console.log({ file });
+  console.log({ docType }, { file });
 
   const [uiElements, setUIElements] = useState({
     loading: false,
@@ -70,7 +69,7 @@ const DocPage = ({ isNew }) => {
     formData.append("type", docType);
     // Now send this formData as body.
   */
-
+    setTimeNotification({ loading: true });
     e.preventDefault();
     const formData = new FormData(e.target);
     // NOTE: The private key in formData is in text or PEM (Privacy Enhanced Mail) format
@@ -103,16 +102,17 @@ const DocPage = ({ isNew }) => {
 
     // formData.set("privateKey", privateKey);
 
-    // (1) Sign the document:
-    const signature = await signDocument(formData.get("privateKey"), formData.get("document"));
-    formData.append("signature", signature);
-    // Remove private key from formData (not to be sent to server):
-    formData.delete("privateKey");
-    console.log(Object.fromEntries(formData)); // Just to check the inputs
-    // setUIElements({ loading: true, message: "", error: "" });
-    setTimeNotification({ loading: true });
-
     try {
+      // (1) Sign the document:
+      const signature = await signDocument(formData.get("privateKey"), formData.get("document"));
+      console.log(signature);
+
+      formData.append("signature", signature);
+      // Remove private key from formData (not to be sent to server):
+      formData.delete("privateKey");
+      console.log(Object.fromEntries(formData)); // Just to check the inputs
+      // setUIElements({ loading: true, message: "", error: "" });
+
       let URL = "http://localhost:3000/api/documents/";
 
       const response = await fetch(URL, {
@@ -165,10 +165,7 @@ const DocPage = ({ isNew }) => {
   return (
     <MainLayout>
       <SidebarDoc styles={"default"}>
-        <div className="action-buttons w-[95%] md:w-1/2 mx-auto my-10 flex flex-col justify-center gap-4">
-          <Button color="primary" variant="flat" onClick={handleDocSubmit}>
-            Save
-          </Button>
+        {/* <div className="action-buttons w-[95%] md:w-1/2 mx-auto mt-10 flex flex-col justify-center gap-4">
           <Button
             color="danger"
             variant="flat"
@@ -176,96 +173,74 @@ const DocPage = ({ isNew }) => {
               navigate("/");
             }}
           >
-            {/* {isNew ? "Cancel" : "Go Back"} */}
             Cancel
           </Button>
-        </div>
-      </SidebarDoc>
-      <Content>
+        </div> */}
         {uiElements.loading && (
-          <div className="bg-primary rounded py-2 px-4 w-2/3 m-auto text-center">
-            <p>Processing Changes! Please wait</p>
-          </div>
-        )}
-        {uiElements.message && (
-          <div className="bg-success rounded py-2 px-4 w-2/3 m-auto text-center">
-            <p>{uiElements.message}</p>
+          <div className="bg-primary rounded py-2 px-4">
+            <p>Processing! Please wait</p>
           </div>
         )}
         {uiElements.error && (
-          <div className="bg-danger rounded py-2 px-4 w-2/3 m-auto text-center">
+          <div className="bg-danger rounded py-2 px-4">
             <p>{uiElements.error}</p>
           </div>
         )}
-        <Form onSubmit={handleDocSubmit}>
-          <div className="flex flex-col gap-12 justify-center">
-            {/* <Input
-            size="lg"
-            classNames={{ base: "w-3/5 m-auto", input: "text-3xl text-center" }}
-            type="text"
-            value={title}
-            onChange={handleTitleChange}
-            label="Title"
-            // labelPlacement="outside"
-            variant="underlined"
-            required
-          ></Input> */}
-            {/* <Textarea
-            size=""
-            type="text"
-            value={summary}
-            onChange={handleSummaryChange}
-            label="Summary"
-            labelPlacement="outside"
-            variant="underlined"
-            // required
-          /> */}
-            <Select
-              classNames={{ base: "m-auto" }}
-              required
-              name="documentType"
-              size="lg"
-              label="Document Type"
-              labelPlacement="outside-left"
-              className="max-w-sm"
-              selectedKeys={[docType]}
-              onChange={handleDocTypeChange}
-            >
-              {docTypes.map((type) => (
-                <SelectItem
-                  key={type}
-                  // value={lang.name}  // key is taken as the value
-                >
-                  {type}
-                </SelectItem>
-              ))}
-            </Select>
-            <Input
-              size="lg"
-              classNames={{ base: "w-3/5 m-auto", input: "text-xl text-center" }}
-              name="document"
-              type="file"
-              label="Document"
-              // labelPlacement="outside"
-              onChange={handleFileInputChange}
-              // variant=""
-              accept="application/pdf"
-              // required
-            ></Input>
-            <Textarea
-              name="privateKey"
-              label="Private Key"
-              labelPlacement="outside"
-              required
-            ></Textarea>
-            <Button type="submit" color="primary" className="m-auto">
-              Submit
-            </Button>
+        {uiElements.message && (
+          <div className="bg-success rounded py-2 px-4">
+            <p>{uiElements.message}</p>
           </div>
+        )}
+      </SidebarDoc>
+      <Content>
+        <div className="flex flex-row"></div>
+        <Form onSubmit={handleDocSubmit} className="flex flex-col gap-12 justify-center">
+          <Select
+            classNames={{ base: "w-4/5 m-auto" }}
+            isRequired
+            name="documentType"
+            size="lg"
+            label="Document Type"
+            labelPlacement="outside"
+            // className="max-w-sm"
+            selectedKeys={[docType]}
+            onChange={handleDocTypeChange}
+          >
+            {docTypes.map((type) => (
+              <SelectItem
+                key={type}
+                // value={lang.name}  // key is taken as the value
+              >
+                {type}
+              </SelectItem>
+            ))}
+          </Select>
+          <Input
+            size="lg"
+            type="file"
+            classNames={{ base: "w-4/5 m-auto" }}
+            name="document"
+            label="Document"
+            labelPlacement="outside"
+            onChange={handleFileInputChange}
+            // variant=""
+            accept="application/pdf"
+            required
+          ></Input>
+          <Textarea
+            classNames={{ base: "w-4/5 m-auto" }}
+            name="privateKey"
+            label="Private Key"
+            labelPlacement="outside"
+            required
+          ></Textarea>
+          <Button type="submit" color="primary" className="m-auto">
+            Submit
+          </Button>
         </Form>
       </Content>
     </MainLayout>
   );
 };
 
-export default DocPage;
+export default NewDocPage;

@@ -183,7 +183,6 @@ const DocPageUser = () => {
   return (
     <MainLayout>
       <SidebarDoc styles={"default"}>
-        {" "}
         {uiElements.loading && (
           <div className="bg-primary rounded py-2 px-4">
             <p>Saving! Please wait</p>
