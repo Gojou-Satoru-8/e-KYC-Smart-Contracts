@@ -1,9 +1,12 @@
 import { Divider, Button, Listbox, ListboxItem } from "@nextui-org/react";
 import IconWrapper from "./IconWrapper";
-import { Link } from "react-router-dom";
+import BookIcon from "../assets/BookIcon";
 import HomeIcon from "../assets/HomeIcon";
+import { useSelector } from "react-redux";
 
 const SidebarSettings = ({ styles, children }) => {
+  const authState = useSelector((state) => state.auth);
+  const isVerifiedUser = authState.entityType === "User" && authState.entity?.isVerified;
   return (
     <aside
       className={
@@ -30,6 +33,22 @@ const SidebarSettings = ({ styles, children }) => {
         >
           Home
         </ListboxItem>
+        {isVerifiedUser && (
+          <ListboxItem
+            key="new_document"
+            href="/users/new-document"
+            variant="faded"
+            color="success"
+            startContent={
+              <IconWrapper className="bg-success/10 text-success">
+                <BookIcon className="text-lg" />
+              </IconWrapper>
+            }
+          >
+            {/* <Link to="/users/new-document">New Document</Link> */}
+            New Document
+          </ListboxItem>
+        )}
       </Listbox>
 
       <Divider />

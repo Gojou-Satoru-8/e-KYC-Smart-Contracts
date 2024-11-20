@@ -12,7 +12,6 @@ const SidebarDoc = ({ styles, children }) => {
   const authState = useSelector((state) => state.auth);
   const isVerifiedUser = authState.entityType === "User" && authState.entity?.isVerified;
   const location = useLocation();
-
   const newDocumentPage = location.pathname.includes("/new-document");
   // console.log(location.pathname, newDocumentPage);
 
@@ -31,6 +30,19 @@ const SidebarDoc = ({ styles, children }) => {
           base: "px-3 first:rounded-t-medium last:rounded-b-medium rounded-none gap-3 h-12 ",
         }}
       >
+        <ListboxItem
+          key="home"
+          href="/"
+          variant="bordered"
+          color="success"
+          startContent={
+            <IconWrapper className="bg-success/10 text-success">
+              <HomeIcon />
+            </IconWrapper>
+          }
+        >
+          Home
+        </ListboxItem>
         {isVerifiedUser && !newDocumentPage && (
           <ListboxItem
             key="new_document"
@@ -47,19 +59,6 @@ const SidebarDoc = ({ styles, children }) => {
             New Document
           </ListboxItem>
         )}
-        <ListboxItem
-          key="home"
-          href="/"
-          variant="bordered"
-          color="success"
-          startContent={
-            <IconWrapper className="bg-success/10 text-success">
-              <HomeIcon />
-            </IconWrapper>
-          }
-        >
-          Home
-        </ListboxItem>
         <ListboxItem
           key="settings"
           href={`/${authState.entityType?.toLowerCase()}s/settings`}

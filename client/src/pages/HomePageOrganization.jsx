@@ -152,15 +152,18 @@ const HomePageOrganization = ({ userType }) => {
     fetchChainVerifyRecord(`http://localhost:3000/api/documents/verify/${document.id}`);
   };
   const handleVerifyRecordManual = (e) => {
+    setTimeNotification({ loading: true });
     e.preventDefault();
     const formData = new FormData(e.target);
     const documentIdHash = formData.get("documentIdHash");
-    if (!documentIdHash || documentIdHash !== document?.documentIdHash) {
+    console.log(documentIdHash === blockchainRecord?.documentIdHash);
+
+    if (!documentIdHash || documentIdHash !== blockchainRecord?.documentIdHash) {
       setTimeNotification({ error: "Please enter the correct Document ID" });
       return;
     }
     fetchChainVerifyRecord(
-      `http://localhost:3000/api/documents/verify/${documentIdHash}/type=hash`
+      `http://localhost:3000/api/documents/verify/${documentIdHash}?type=hash`
     );
   };
   return (
@@ -172,7 +175,7 @@ const HomePageOrganization = ({ userType }) => {
             <h3 className="text-xl text-center">Enter code to view documents:</h3>
             {uiElements.loading && (
               <div className="bg-primary rounded py-2 px-4">
-                <p>Saving! Please wait</p>
+                <p>Processing! Please wait</p>
               </div>
             )}
             {uiElements.error && (

@@ -193,7 +193,7 @@ const DocPageVerifier = () => {
       <SidebarDoc styles={"default"}>
         {uiElements.loading && (
           <div className="bg-primary rounded py-2 px-4">
-            <p>Saving! Please wait</p>
+            <p>Processing! Please wait</p>
           </div>
         )}
         {uiElements.error && (

@@ -169,15 +169,18 @@ const DocPageUser = () => {
     fetchChainVerifyRecord(`http://localhost:3000/api/documents/verify/${document.id}`);
   };
   const handleVerifyRecordManual = (e) => {
+    setTimeNotification({ loading: true });
     e.preventDefault();
     const formData = new FormData(e.target);
     const documentIdHash = formData.get("documentIdHash");
-    if (!documentIdHash || documentIdHash !== document?.documentIdHash) {
-      setTimeNotification({ error: "Please enter the correct Document ID" });
+    console.log(documentIdHash === blockchainRecord?.documentIdHash);
+
+    if (!documentIdHash || documentIdHash !== blockchainRecord?.documentIdHash) {
+      setTimeNotification({ error: "Please enter the correct Document ID Hash" });
       return;
     }
     fetchChainVerifyRecord(
-      `http://localhost:3000/api/documents/verify/${documentIdHash}/type=hash`
+      `http://localhost:3000/api/documents/verify/${documentIdHash}?type=hash`
     );
   };
   return (
@@ -185,7 +188,7 @@ const DocPageUser = () => {
       <SidebarDoc styles={"default"}>
         {uiElements.loading && (
           <div className="bg-primary rounded py-2 px-4">
-            <p>Saving! Please wait</p>
+            <p>Processing! Please wait</p>
           </div>
         )}
         {uiElements.error && (
@@ -250,8 +253,9 @@ const DocPageUser = () => {
           )}
         </Breadcrumbs>
 
-        <div className="flex flex-col md:flex-row gap-5 my-5">
-          <Card className="basis-2/5">
+        <div className="flex flex-col md:flex-row gap-5 my-5 justify-center">
+          {/* NOTE: If the second card is present, it occupies 2/5, else if its alone then 1/2 */}
+          <Card className={document?.status === "Approved" ? "basis-2/5" : "basis-1/2"}>
             <CardHeader className="justify-center mt-2">
               <h3 className="text-2xl font-semibold leading-none text-default-600">
                 Submission Details
