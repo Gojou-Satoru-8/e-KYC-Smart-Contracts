@@ -89,7 +89,9 @@ const HomePageUser = () => {
                   }}
                   // isBlurred
                   // isFooterBlurred
+                  as={"div"}
                   isPressable
+                  isHoverable
                   onPress={() => handleViewDoc(document._id)}
                   key={document._id}
                 >

@@ -14,7 +14,7 @@ import { DeleteIcon, CloseIcon } from "../assets/DeleteCloseIcon";
 const statusColor = { Pending: "warning", Approved: "success", Rejected: "danger" };
 
 const SidebarHome = ({ isDeleting, setIsDeleting, styles }) => {
-  // Used by both
+  // Used by both HomePageUser and HomePageVerifier
   const dispatch = useDispatch();
   const authState = useSelector((state) => state.auth);
   const documentsState = useSelector((state) => state.documents);
@@ -123,25 +123,28 @@ const SidebarHome = ({ isDeleting, setIsDeleting, styles }) => {
                     // console.log("Outer button clicked");
                     dispatch(documentsActions.addSelectedTags(tag));
                   }}
+                  endContent={
+                    selectedTags?.includes(tag) && (
+                      <div
+                        className="hover:bg-danger/50 rounded-lg"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Stopping the "click" event here, otherwise it will trigger the onClick
+                          // event-handler of the parent element Button
+                          // console.log("Inner div clicked");
+                          dispatch(documentsActions.removeSelectedTag(tag));
+                        }}
+                      >
+                        {/* <img src={CloseIcon} alt="" width={"15"} /> */}
+                        {/* <IconWrapper className="bg-danger/10 text-danger"> */}
+                        <IconWrapper className="text-danger max-w-4 max-h-4">
+                          <CloseIcon />
+                        </IconWrapper>
+                      </div>
+                    )
+                  }
                 >
                   {tag}
-
-                  {selectedTags?.includes(tag) && (
-                    <div
-                      className="hover:bg-red-800 rounded-lg min-w-3"
-                      onClick={(e) => {
-                        e.stopPropagation(); // Stopping the "click" event here, otherwise it will trigger the onClick
-                        // event-handler of the parent element Button
-                        // console.log("Inner div clicked");
-                        dispatch(documentsActions.removeSelectedTags(tag));
-                      }}
-                    >
-                      {/* <img src={CloseIcon} alt="" width={"15"} /> */}
-                      <IconWrapper className="bg-danger/10 text-danger">
-                        <CloseIcon />
-                      </IconWrapper>
-                    </div>
-                  )}
                 </Button>
               </li>
               {/* <Divider /> */}
