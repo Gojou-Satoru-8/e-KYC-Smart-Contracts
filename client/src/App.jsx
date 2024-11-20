@@ -11,7 +11,7 @@ import HomePageOrganization from "./pages/HomePageOrganization";
 import DocPageUser from "./pages/DocPageUser";
 import DocPageVerifier from "./pages/DocPageVerifier";
 import NewDocPage from "./pages/NewDocPage";
-import UserSettingsPage from "./pages/UserSettingsPage";
+import SettingsPage from "./pages/SettingsPage";
 import HomePageVerifier from "./pages/HomePageVerifier";
 
 const router = createBrowserRouter([
@@ -26,18 +26,22 @@ const router = createBrowserRouter([
           { index: true, element: <HomePageUser /> },
           { path: "/users/documents/:id", element: <DocPageUser /> },
           { path: "/users/new-document", element: <NewDocPage /> },
-          { path: "/users/settings", element: <UserSettingsPage /> },
+          { path: "/users/settings", element: <SettingsPage /> },
         ],
       },
       {
         path: "/organizations",
-        children: [{ index: true, element: <HomePageOrganization /> }],
+        children: [
+          { index: true, element: <HomePageOrganization /> },
+          { path: "/organizations/settings", element: <SettingsPage /> },
+        ],
       },
       {
         path: "/verifiers",
         children: [
           { index: true, element: <HomePageVerifier /> },
           { path: "/verifiers/documents/:id", element: <DocPageVerifier /> },
+          { path: "/verifiers/settings", element: <SettingsPage /> },
         ],
       },
     ],

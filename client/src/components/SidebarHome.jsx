@@ -137,7 +137,7 @@ const SidebarHome = ({ isDeleting, setIsDeleting, styles }) => {
                       >
                         {/* <img src={CloseIcon} alt="" width={"15"} /> */}
                         {/* <IconWrapper className="bg-danger/10 text-danger"> */}
-                        <IconWrapper className="text-danger max-w-4 max-h-4">
+                        <IconWrapper className="text-black max-w-4 max-h-4">
                           <CloseIcon />
                         </IconWrapper>
                       </div>

@@ -23,7 +23,7 @@ const VerifierSchema = new mongoose.Schema(
     },
     name: {
       type: String,
-      required: true,
+      required: [true, "Name is a required field"],
       trim: true,
       validate: {
         validator: function (val) {
@@ -58,6 +58,7 @@ const VerifierSchema = new mongoose.Schema(
       ],
       minLength: [8, "Password must have minimum 8 characters"],
       maxLength: [20, "Password must not exceed 20 characters"],
+      select: false,
     },
     lastPasswordChanged: {
       type: Date,

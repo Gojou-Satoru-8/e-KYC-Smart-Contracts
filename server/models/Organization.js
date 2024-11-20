@@ -54,6 +54,7 @@ const OrganizationSchema = new mongoose.Schema(
       ],
       minLength: [8, "Password must have minimum 8 characters"],
       maxLength: [20, "Password must not exceed 20 characters"],
+      select: false,
     },
     lastPasswordChanged: {
       type: Date,

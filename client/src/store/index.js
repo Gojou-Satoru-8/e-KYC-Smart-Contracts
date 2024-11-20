@@ -84,7 +84,7 @@ const documentsSlice = createSlice({
       // console.log(state.selectedTags.join(","));
       window.localStorage.setItem("selectedTags", JSON.stringify(state.selectedTags));
     },
-    removeSelectedTags: (state, action) => {
+    removeSelectedTag: (state, action) => {
       const tagToRemove = action.payload;
       state.selectedTags = state.selectedTags.filter((tag) => tag !== tagToRemove);
       window.localStorage.setItem("selectedTags", JSON.stringify(state.selectedTags));

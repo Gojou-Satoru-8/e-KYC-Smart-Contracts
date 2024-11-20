@@ -7,6 +7,7 @@ import {
   Button,
   Avatar,
   Divider,
+  Spinner,
 } from "@nextui-org/react";
 
 import { useEffect, useState } from "react";
@@ -22,10 +23,10 @@ import { UserIcon } from "../assets/UserIcon";
 import PhoneIcon from "../assets/PhoneIcon";
 // import { EyeFilledIcon, EyeSlashFilledIcon } from "../assets/EyeIconsPassword";
 
-const SettingsAccount = () => {
+const SettingsUser = () => {
   // const [eyeIconVisible, setEyeIconVisible] = useState(false);
   const authState = useSelector((state) => state.auth);
-  console.log("Account Settings Page:", authState);
+  console.log("User Settings Component:", authState);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -54,7 +55,7 @@ const SettingsAccount = () => {
     setUserInfo((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleCancelUpdate = (e) => {
+  const handleCancelUpdate = () => {
     setUserInfo({
       // email: authState.entity?.email,
       username: authState.entity?.username,
@@ -98,14 +99,16 @@ const SettingsAccount = () => {
 
       if (!response.ok || data.status === "fail") {
         setTimeNotification({ error: data.message }, 2);
+        setTimeout(() => handleCancelUpdate(), 2000);
         return;
       }
 
-      dispatch(authActions.updateEntity({ entity: data.entity, entityType: data.entityType }));
+      dispatch(authActions.updateEntity({ entity: data.entity, entityType: "User" }));
       setTimeNotification({ message: data.message }, 2);
     } catch (err) {
-      console.log("Unable to update user-info: ", err.message);
-      setTimeNotification({ error: "No Internet Connection!" }, 2);
+      console.log("Unable to update profile-info: ", err.message);
+      setTimeNotification({ error: "Unable to update profile! Please check your internet" }, 2);
+      setTimeout(() => handleCancelUpdate(), 2000);
     }
   };
   useEffect(() => {
@@ -136,22 +139,28 @@ const SettingsAccount = () => {
                   authState.entity?.photo
                 }?t=${new Date().getTime()}`}
               />
-              <h3 className="text-3xl text-center">{userInfo.name}</h3>
+              <h3 className="text-3xl text-center">{authState.entity?.name}</h3>
             </>
           )}
 
           {isLoading && (
-            <div className="bg-primary rounded py-2 px-4">
-              <p>Saving! Please wait</p>
+            <div className="bg-primary/40 rounded py-2 px-4">
+              <p>
+                <Spinner
+                  color="success"
+                  classNames={{ base: "w-6 h-5", circle1: "w-6 h-6", circle2: "w-6 h-6" }}
+                />
+                Processing! Please wait
+              </p>
             </div>
           )}
           {error && (
-            <div className="bg-danger rounded py-2 px-4">
+            <div className="bg-danger/80 rounded py-2 px-4">
               <p>{error}</p>
             </div>
           )}
           {message && (
-            <div className="bg-success rounded py-2 px-4">
+            <div className="bg-success/80 rounded py-2 px-4">
               <p>{message}</p>
             </div>
           )}
@@ -260,7 +269,7 @@ const SettingsAccount = () => {
           </div>
           <Divider />
           <div className="flex flex-row justify-center gap-2 m-auto">
-            <ChangePasswordModalButton />
+            <ChangePasswordModalButton userType={"User"} />
             <GenerateKeysModalButton />
           </div>
         </CardFooter>
@@ -269,4 +278,4 @@ const SettingsAccount = () => {
   );
 };
 
-export default SettingsAccount;
+export default SettingsUser;
