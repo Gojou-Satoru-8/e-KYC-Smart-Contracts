@@ -27,7 +27,7 @@ const validatePassword = (currentPassword, newPassword) => {
 };
 
 const ChangePasswordModalButton = () => {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const authState = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -35,13 +35,14 @@ const ChangePasswordModalButton = () => {
     loading: false,
     error: "",
     message: "",
-    tokenMsg: "",
   });
   const [eyeIconVisible, setEyeIconVisible] = useState({
     token: false,
     currentPassword: false,
     newPassword: false,
   });
+
+  const [tokenState, setTokenState] = useState({ tokenSent: false, tokenMsg: "" });
   const toggleEyeIconVisibility = (key) => {
     setEyeIconVisible((prev) => {
       // console.log(key, prev[key]);
@@ -49,12 +50,9 @@ const ChangePasswordModalButton = () => {
     });
   };
 
-  const setTimeNotification = (
-    { loading = false, message = "", error = "", tokenMsg = "" },
-    seconds = 0
-  ) => {
+  const setTimeNotification = ({ loading = false, message = "", error = "" }, seconds = 0) => {
     const timeout = setTimeout(() => {
-      setUIElements({ loading, message, error, tokenMsg });
+      setUIElements({ loading, message, error });
     }, seconds * 1000);
     return timeout;
   };
@@ -66,8 +64,9 @@ const ChangePasswordModalButton = () => {
     //   error: "",
     //   tokenMsg: "Trying to mail your Token...",
     // });
-    setTimeNotification({ tokenMsg: "Trying to mail your Token..." });
+    // setTimeNotification({ tokenMsg: "Trying to mail your Token..." });
     // onOpen(); // Opens the modal
+    setTokenState({ tokenSent: false, tokenMsg: "Trying to mail your Token" });
     try {
       const response = await fetch("http://localhost:3000/api/users/generate-password-token", {
         method: "POST",
@@ -75,14 +74,21 @@ const ChangePasswordModalButton = () => {
         body: JSON.stringify({ email: authState.entity.email }),
         // credentials: "include"
       });
+      console.log(response);
       const data = await response.json();
+      console.log(data);
+
       if (!response.ok || data.status !== "success") {
-        setTimeNotification({ error: data.message }, 1.5);
+        setTokenState({ tokenSent: false, tokenMsg: data.message });
         return;
       }
-      setTimeNotification({ tokenMsg: data.message }, 1.5);
+      setTokenState({ tokenSent: true, tokenMsg: data.message });
     } catch (err) {
-      setTimeNotification({ error: err.message });
+      console.log(err);
+      setTokenState({
+        tokenSent: false,
+        tokenMsg: "Unable to mail your token (Check your internet)",
+      });
     }
   };
   const handlePasswordReset = async (e) => {
@@ -126,21 +132,25 @@ const ChangePasswordModalButton = () => {
       // client state
       // Finally, when successful:
       setTimeNotification({ message: data.message }, 1.5);
+      setTimeout(() => onClose(), 5000);
     } catch (err) {
-      setTimeNotification({ error: "No Internet Connection!" }, 1.5);
+      setTimeNotification({ error: "No Internet Connection!" });
     }
   };
 
   useEffect(() => {
-    // setTimeout(() => {
-    //   if (uiElements.message || uiElements.error || uiElements.tokenMsg)
-    //     setUIElements((prev) => ({ ...prev, message: "", error: "", tokenMsg: "" }));
-    // }, 4000);
-    if (uiElements.message || uiElements.error || uiElements.tokenMsg) {
+    if (uiElements.message || uiElements.error) {
       const timeout = setTimeNotification({}, 4);
       return () => clearTimeout(timeout);
     }
-  }, [uiElements.message, uiElements.error, uiElements.tokenMsg]);
+  }, [uiElements.message, uiElements.error]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (tokenState.tokenMsg) setTokenState((prev) => ({ ...prev, tokenMsg: "" }));
+    }, 8000);
+    return () => clearTimeout(timeout);
+  }, [tokenState.tokenMsg]);
 
   return (
     <>
@@ -180,7 +190,7 @@ const ChangePasswordModalButton = () => {
                     </div>
                   )}
 
-                  {uiElements.tokenMsg && <h3 className="text-lg">{uiElements.tokenMsg}</h3>}
+                  {tokenState.tokenMsg && <h3 className="text-lg">{tokenState.tokenMsg}</h3>}
 
                   <Input
                     type={eyeIconVisible.token ? "text" : "password"}
@@ -201,7 +211,7 @@ const ChangePasswordModalButton = () => {
                       </button>
                     }
                     required
-                  ></Input>
+                  />
                   <Input
                     type={eyeIconVisible.currentPassword ? "text" : "password"}
                     name="currentPassword"
@@ -221,7 +231,7 @@ const ChangePasswordModalButton = () => {
                       </button>
                     }
                     required
-                  ></Input>
+                  />
                   <Input
                     type={eyeIconVisible.newPassword ? "text" : "password"}
                     name="newPassword"
@@ -241,16 +251,17 @@ const ChangePasswordModalButton = () => {
                       </button>
                     }
                     required
-                  ></Input>
+                  />
                 </ModalBody>
                 <ModalFooter>
                   <Button
                     type="button"
                     color="success"
                     variant="light"
+                    isDisabled={tokenState.tokenMsg}
                     onClick={getPasswordResetTokenMail}
                   >
-                    Get Token
+                    Get {tokenState.tokenSent && "Another"} Token
                   </Button>
                   <Button type="submit" color="primary" variant="light">
                     Change Password

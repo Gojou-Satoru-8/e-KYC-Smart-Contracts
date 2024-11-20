@@ -43,12 +43,9 @@ const GenerateKeysModalButton = () => {
   const toggleEyeIconVisibility = () => setEyeIconVisible((prev) => !prev);
 
   const tokenRef = useRef(null);
-  const setTimeNotification = (
-    { loading = false, message = "", error = "", tokenMsg = "" },
-    seconds = 0
-  ) => {
+  const setTimeNotification = ({ loading = false, message = "", error = "" }, seconds = 0) => {
     const timeout = setTimeout(() => {
-      setUIElements({ loading, message, error, tokenMsg });
+      setUIElements({ loading, message, error });
     }, seconds * 1000);
     return timeout;
   };
@@ -61,11 +58,10 @@ const GenerateKeysModalButton = () => {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      if (tokenState.tokenSent && tokenState.tokenMsg)
-        setTokenState((prev) => ({ ...prev, tokenMsg: "" }));
+      if (tokenState.tokenMsg) setTokenState((prev) => ({ ...prev, tokenMsg: "" }));
     }, 8000);
     return () => clearTimeout(timeout);
-  }, [tokenState.tokenSent, tokenState.tokenMsg]);
+  }, [tokenState.tokenMsg]);
 
   useEffect(() => {
     if (isCopied.publicKey || isCopied.privateKey) {
@@ -94,21 +90,28 @@ const GenerateKeysModalButton = () => {
       }
 
       if (!response.ok || data.status !== "success") {
-        setTimeNotification({ error: data.message }, 1.5);
+        setTokenState({ tokenSent: false, tokenMsg: data.message });
         return;
       }
 
-      setTokenState({ tokenSent: true, tokenMsg: data.message }, 1.5);
+      setTokenState({ tokenSent: true, tokenMsg: data.message });
     } catch (err) {
-      setTimeNotification({ error: err.message });
+      console.log(err);
+      setTokenState({
+        tokenSent: false,
+        tokenMsg: "Unable to mail your token (Check your internet)",
+      });
     }
   };
   const handleGenerateKeyPair = async (e) => {
+    // setTimeNotification({ loading: true });
+    setUIElements({ loading: true, error: "", message: "" });
+    // Better than setTimeNofication in this case (as generateKeyPair is synchronous)
     if (!tokenRef.current.value) {
       setTimeNotification({ error: "Please enter a token" });
       return;
     }
-    setTimeNotification({ loading: true });
+
     const keys = generateKeyPair();
     console.log("Public Key:", keys.publicKeyPem);
     console.log("Private Key:", keys.privateKeyPem);

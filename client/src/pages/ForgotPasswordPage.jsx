@@ -7,6 +7,16 @@ import { MailIcon } from "../assets/MailIcon";
 import { EyeFilledIcon, EyeSlashFilledIcon } from "../assets/EyeIconsPassword";
 import { useRedirectIfAuthenticated } from "../hooks/checkAuthHooks";
 
+const validatePassword = (password) => {
+  const errors = [];
+  if (password.length < 8 || password.length > 15)
+    errors.push("Set a password between 8 and 15 characters");
+  if (password.search(/(%|_|#|!|@|\$|%|\^|&|\*)/) === -1)
+    // All special characters from the number row
+    errors.push("Password must include a special character like %, _, #, ! etc.");
+  return [...errors];
+};
+
 const ForgotPasswordPage = ({ userType }) => {
   // userType: User | Organization | Verifier
   const authState = useRedirectIfAuthenticated();
@@ -17,12 +27,9 @@ const ForgotPasswordPage = ({ userType }) => {
     error: "",
     message: "",
   });
-
   const [tokenState, setTokenState] = useState({ tokenMsg: "", tokenSent: false });
-  const [eyeIconVisible, setEyeIconVisible] = useState({
-    token: false,
-    password: false,
-  });
+  const [eyeIconVisible, setEyeIconVisible] = useState({ token: false, password: false });
+
   const toggleEyeIconVisibility = (key) => {
     setEyeIconVisible((prev) => {
       // console.log(key, prev[key]);
@@ -46,6 +53,11 @@ const ForgotPasswordPage = ({ userType }) => {
     // }
     const formDataObj = Object.fromEntries(formData);
     console.log(formDataObj);
+    if (!formDataObj.email) {
+      // NOTE: Likely not to be triggered as required attribute is used.
+      setTimeNotification({ error: "Email is a required field" });
+      return;
+    }
 
     try {
       const response = await fetch(
@@ -57,15 +69,22 @@ const ForgotPasswordPage = ({ userType }) => {
           // credentials: "include"
         }
       );
+      console.log(response);
       const data = await response.json();
+      console.log(data);
+
       if (!response.ok || data.status === "fail") {
-        setTimeNotification({ error: data.message }, 1.5);
+        setTokenState({ tokenSent: false, tokenMsg: data.message });
         return;
       }
-      setTokenState({ tokenSent: true, tokenMsg: data.message }, 1.5);
+      setTokenState({ tokenSent: true, tokenMsg: data.message });
       //   emailPersisted = formDataObj.email;
     } catch (err) {
-      setTimeNotification({ error: "No Internet Connection!" }, 1.5);
+      console.log(err);
+      setTokenState({
+        tokenSent: false,
+        tokenMsg: "Unable to mail your token (Check your internet)",
+      });
     }
   };
   const handlePasswordReset = async (e) => {
@@ -79,7 +98,18 @@ const ForgotPasswordPage = ({ userType }) => {
     const formDataObj = Object.fromEntries(formData);
     // formDataObj.email = emailPersisted;
     console.log(formDataObj);
+    if (!formDataObj.token) {
+      // NOTE: Likely not to be triggered as required attribute is used.
+      setTimeNotification({ error: "Please enter your token" });
+      return;
+    }
 
+    const errors = validatePassword(formDataObj.password);
+    if (errors.length > 0) {
+      //   setUIElements({ loading: false, message: "", error: errors.join(", ") });
+      setTimeNotification({ error: errors.join(". ") });
+      return;
+    }
     try {
       const response = await fetch(
         `http://localhost:3000/api/${userType.toLowerCase()}s/reset-password`,
@@ -92,7 +122,7 @@ const ForgotPasswordPage = ({ userType }) => {
       );
 
       const data = await response.json();
-      if (!response.ok || data.status === "fail") {
+      if (!response.ok || data.status !== "success") {
         setTimeNotification({ error: data.message }, 1.5);
         return;
       }
@@ -107,15 +137,18 @@ const ForgotPasswordPage = ({ userType }) => {
   };
 
   useEffect(() => {
-    setTimeout(() => {
-      if (uiElements.message || uiElements.error)
-        setUIElements((prev) => ({ ...prev, message: "", error: "" }));
-    }, 4000);
-    setTimeout(() => {
-      if (tokenState.tokenSent && tokenState.tokenMsg)
-        setTokenState((prev) => ({ ...prev, tokenMsg: "" }));
+    if (uiElements.message || uiElements.error) {
+      const timeout = setTimeNotification({}, 4);
+      return () => clearTimeout(timeout);
+    }
+  }, [uiElements.message, uiElements.error]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (tokenState.tokenMsg) setTokenState((prev) => ({ ...prev, tokenMsg: "" }));
     }, 8000);
-  }, [uiElements, tokenState]);
+    return () => clearTimeout(timeout);
+  }, [tokenState.tokenMsg]);
 
   return (
     <>
@@ -154,10 +187,10 @@ const ForgotPasswordPage = ({ userType }) => {
                     <MailIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0 m-auto" />
                   }
                   required
-                ></Input>
+                />
                 <div className="flex flex-row justify-center gap-8 pt-2">
                   <Button type="submit" color="success" isDisabled={tokenState.tokenMsg !== ""}>
-                    Get Token
+                    Get {tokenState.tokenSent && "Another"} Token
                   </Button>
                 </div>
               </CardBody>
@@ -173,6 +206,7 @@ const ForgotPasswordPage = ({ userType }) => {
                   label="Password Reset Token"
                   labelPlacement="outside"
                   size="lg"
+                  required
                   endContent={
                     <button
                       className="focus:outline-none m-auto"
@@ -187,8 +221,7 @@ const ForgotPasswordPage = ({ userType }) => {
                       )}
                     </button>
                   }
-                  required
-                ></Input>
+                />
 
                 <Input
                   type={eyeIconVisible.password ? "text" : "password"}
@@ -196,6 +229,7 @@ const ForgotPasswordPage = ({ userType }) => {
                   label="New Password"
                   labelPlacement="outside"
                   size="lg"
+                  required
                   endContent={
                     <button
                       className="focus:outline-none m-auto"
@@ -210,8 +244,7 @@ const ForgotPasswordPage = ({ userType }) => {
                       )}
                     </button>
                   }
-                  required
-                ></Input>
+                />
                 <div className="flex flex-row justify-center gap-8 pt-2">
                   <Button type="submit" color="primary">
                     Change Password
