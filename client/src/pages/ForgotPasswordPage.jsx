@@ -9,8 +9,8 @@ import { useRedirectIfAuthenticated } from "../hooks/checkAuthHooks";
 
 const validatePassword = (password) => {
   const errors = [];
-  if (password.length < 8 || password.length > 15)
-    errors.push("Set a password between 8 and 15 characters");
+  if (password.length < 8 || password.length > 20)
+    errors.push("Set a password between 8 and 20 characters");
   if (password.search(/(%|_|#|!|@|\$|%|\^|&|\*)/) === -1)
     // All special characters from the number row
     errors.push("Password must include a special character like %, _, #, ! etc.");

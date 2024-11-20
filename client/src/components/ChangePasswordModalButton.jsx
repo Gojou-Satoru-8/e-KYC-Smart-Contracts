@@ -18,15 +18,15 @@ const validatePassword = (currentPassword, newPassword) => {
   const errors = [];
   if (currentPassword === newPassword)
     errors.push("Your new password can't match your current one");
-  if (newPassword.length < 8 || newPassword.length > 15)
-    errors.push("Set a password between 8 and 15 characters");
+  if (newPassword.length < 8 || newPassword.length > 20)
+    errors.push("Set a password between 8 and 20 characters");
   if (newPassword.search(/(%|_|#|!|@|\$|%|\^|&|\*)/) === -1)
     // All special characters from the number row
     errors.push("Password must include a special character like %, _, #, ! etc.");
   return [...errors];
 };
 
-const ChangePasswordModalButton = () => {
+const ChangePasswordModalButton = ({ userType }) => {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const authState = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -68,12 +68,15 @@ const ChangePasswordModalButton = () => {
     // onOpen(); // Opens the modal
     setTokenState({ tokenSent: false, tokenMsg: "Trying to mail your Token" });
     try {
-      const response = await fetch("http://localhost:3000/api/users/generate-password-token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: authState.entity.email }),
-        // credentials: "include"
-      });
+      const response = await fetch(
+        `http://localhost:3000/api/${userType.toLowerCase()}s/generate-password-token`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: authState.entity.email }),
+          // credentials: "include"
+        }
+      );
       console.log(response);
       const data = await response.json();
       console.log(data);
@@ -108,12 +111,15 @@ const ChangePasswordModalButton = () => {
       return;
     }
     try {
-      const response = await fetch("http://localhost:3000/api/users/update-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formDataObj),
-        credentials: "include",
-      });
+      const response = await fetch(
+        `http://localhost:3000/api/${userType.toLowerCase()}s/update-password`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formDataObj),
+          credentials: "include",
+        }
+      );
 
       const data = await response.json();
 

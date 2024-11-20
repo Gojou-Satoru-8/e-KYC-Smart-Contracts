@@ -8,8 +8,8 @@ import PhoneIcon from "../assets/PhoneIcon";
 
 const validatePassword = (password, passwordConfirm) => {
   const errors = [];
-  if (password.length < 8 || password.length > 15)
-    errors.push("Password must range between 8 and 15 characters");
+  if (password.length < 8 || password.length > 20)
+    errors.push("Password must range between 8 and 20 characters");
   if (password !== passwordConfirm) errors.push("Passwords must match");
   if (password.search(/(%|_|#|!|@|\$|%|\^|&|\*)/) === -1)
     // All special characters from the number row
