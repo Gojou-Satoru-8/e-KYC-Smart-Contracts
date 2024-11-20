@@ -7,6 +7,7 @@ import Content from "../components/Content";
 import { Card, CardHeader, CardBody, Button, CardFooter, Chip } from "@nextui-org/react";
 import { ScrollShadow } from "@nextui-org/scroll-shadow";
 import { authActions, documentsActions } from "../store";
+import HomeFeedSkeletons from "./HomeFeedSkeletons";
 
 const statusColor = { Pending: "warning", Approved: "success", Rejected: "danger" };
 
@@ -32,7 +33,7 @@ const HomePageVerifier = ({ userType }) => {
 
   // let title = `You have ${!documentsToDisplay.length ? "no" : documentsToDisplay.length} Documents`;
   // Setting up cancel deletion on hitting ESC key
-
+  if (documentsState.loading) return <HomeFeedSkeletons />;
   return (
     <MainLayout>
       <SidebarHome styles={"default"} />

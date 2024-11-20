@@ -64,7 +64,9 @@ const router = createBrowserRouter([
 
 function App() {
   const authState = useGetCurrentUser();
-  if (authState.loading) return <h1>Loading</h1>;
+  // if (authState.loading) return <h1>Loading</h1>;
+  // if (authState.loading) return null;
+  if (authState.loading) return;
 
   return <RouterProvider router={router} />;
 }

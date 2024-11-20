@@ -35,6 +35,7 @@ const initialDocumentsState = {
   documents: [],
   tags: [],
   selectedTags: JSON.parse(window.localStorage.getItem("selectedTags")) || [],
+  loading: true,
 };
 
 const extractTags = (documents = []) => {
@@ -54,7 +55,6 @@ const documentsSlice = createSlice({
       state.documents.push(action.payload.document);
       state.tags = extractTags(state.documents);
     },
-
     updateDocument: (state, action) => {
       const indexOfDocToUpdate = state.documents.findIndex(
         (doc) => doc._id === action.payload.document._id
@@ -74,7 +74,6 @@ const documentsSlice = createSlice({
       state.selectedTags = [];
       window.localStorage.removeItem("selectedTags");
     },
-
     addSelectedTags: (state, action) => {
       const tagToAdd = action.payload;
       // const selectedTagsSet = new Set(state.selectedTags);
@@ -93,6 +92,9 @@ const documentsSlice = createSlice({
     clearSelectedTags: (state, action) => {
       state.selectedTags = [];
       window.localStorage.removeItem("selectedTags");
+    },
+    setLoading: (state, action) => {
+      state.loading = action.payload;
     },
   },
 });

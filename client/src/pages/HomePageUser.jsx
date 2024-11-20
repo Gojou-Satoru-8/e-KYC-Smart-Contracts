@@ -7,7 +7,7 @@ import Content from "../components/Content";
 import { Card, CardHeader, CardBody, Button, CardFooter, Chip } from "@nextui-org/react";
 import { ScrollShadow } from "@nextui-org/scroll-shadow";
 import { authActions, documentsActions } from "../store";
-
+import HomeFeedSkeletons from "./HomeFeedSkeletons";
 const statusColor = { Pending: "warning", Approved: "success", Rejected: "danger" };
 
 // const HomePageUser = ({ userType }) => {
@@ -61,7 +61,8 @@ const HomePageUser = () => {
     // console.log(e);
     if (isDeleting && e.key === "Escape") setIsDeleting(false);
   };
-
+  if (documentsState.loading) return <HomeFeedSkeletons />;
+  // else
   return (
     <MainLayout>
       <SidebarHome styles={"default"} isDeleting={isDeleting} setIsDeleting={setIsDeleting} />
