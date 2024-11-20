@@ -386,7 +386,7 @@ exports.updateEntity = (userType) => {
     // Will be handled by the checkAuth middleware
     res.status(200).json({
       status: "success",
-      message: "User Updated Successfully",
+      message: `${userType} Updated Successfully`,
       entity: updatedEntity,
       // entityType: userType,
     });

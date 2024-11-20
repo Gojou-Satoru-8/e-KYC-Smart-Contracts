@@ -84,13 +84,15 @@ const Header = () => {
                   as="button"
                   className="transition-transform"
                   color="secondary"
-                  // name={authState.user?.name
-                  //   .split(" ")
-                  //   .map((segment) => segment.at(0))
-                  //   .join("")}
+                  name={authState.entity?.name
+                    .split(" ")
+                    .map((segment) => segment.at(0))
+                    .filter((letter) => letter.charCodeAt(0) >= 65 && letter.charCodeAt(0) <= 90)
+                    // This line filters small letters
+                    .join("")}
                   // Here we're taking initials of each segment of name
                   size="sm"
-                  src={`http://localhost:3000/src/user-images/${
+                  src={`http://localhost:3000/src/${authState.entityType?.toLowerCase()}-images/${
                     authState.entity?.photo
                   }?t=${new Date().getTime()}`}
                 />

@@ -185,7 +185,7 @@ const SettingsUser = () => {
               !authState.entity?.isEmailVerified && <VerificationModalButton property={"email"} />
             }
             required
-          ></Input>
+          />
           <Input
             type="tel"
             name="phoneNumber"
@@ -206,7 +206,7 @@ const SettingsUser = () => {
               )
             }
             required
-          ></Input>
+          />
           <Input
             type="username"
             name="username"
@@ -222,7 +222,7 @@ const SettingsUser = () => {
             startContent={<UserIcon className="m-auto" />}
             // endContent={<Button size="sm">Edit</Button>}
             required
-          ></Input>
+          />
           {isEditing && (
             <Input
               type="name"
@@ -237,7 +237,7 @@ const SettingsUser = () => {
               // variant="underlined"
               classNames={{ input: "text-center" }}
               required
-            ></Input>
+            />
           )}
         </CardBody>
         <CardFooter className="flex flex-col gap-5">
