@@ -157,7 +157,7 @@ const DocPageVerifier = () => {
       <SidebarDoc styles={"default"}>
         {uiElements.loading && (
           <div className="bg-primary rounded py-2 px-4">
-            <p>Processing... Saving record on blockchain. This may take some time</p>
+            <p>Processing... Interacting with blockchain. This may take some time</p>
           </div>
         )}
         {uiElements.error && (
