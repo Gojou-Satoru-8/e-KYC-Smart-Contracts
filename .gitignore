@@ -26,3 +26,4 @@ dist-ssr
 server/temp/*
 server/documents/*
 server/.env
+server/uploads/*

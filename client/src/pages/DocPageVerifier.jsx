@@ -225,11 +225,11 @@ const DocPageVerifier = () => {
                 isBordered
                 color="primary"
                 showFallback
-                src={`http://localhost:3000/src/user-images/${
+                src={`http://localhost:3000/uploads/user-images/${
                   userInfo?.photo
                 }?t=${new Date().getTime()}`}
                 // name={authState.entity.name}
-              ></Avatar>
+              />
               <h3 className="text-3xl text-center">User Information</h3>
             </CardHeader>
             <CardBody className="px-10 gap-5 justify-center">

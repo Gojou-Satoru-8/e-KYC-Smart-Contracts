@@ -497,7 +497,7 @@ exports.resizeUserPhoto = (req, res, next) => {
     .resize(500, 500)
     .toFormat("jpeg")
     .jpeg({ quality: 90 })
-    .toFile(path.resolve(__dirname, "..", "dist", "src", "user-images", req.file.filename));
+    .toFile(path.resolve(__dirname, "..", "uploads", "user-images", req.file.filename));
   next();
 };
 

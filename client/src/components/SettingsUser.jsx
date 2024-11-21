@@ -135,7 +135,7 @@ const SettingsUser = () => {
                 // name={userInfo.name}
               ></Avatar> */}
               <UpdatePfpModalButton
-                photoSrc={`http://localhost:3000/src/user-images/${
+                photoSrc={`http://localhost:3000/uploads/user-images/${
                   authState.entity?.photo
                 }?t=${new Date().getTime()}`}
               />

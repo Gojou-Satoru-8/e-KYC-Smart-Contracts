@@ -97,7 +97,7 @@ const Header = ({ styles }) => {
                     .join("")}
                   // Here we're taking initials of each segment of name
                   size="sm"
-                  src={`http://localhost:3000/src/${authState.entityType?.toLowerCase()}-images/${
+                  src={`http://localhost:3000/uploads/${authState.entityType?.toLowerCase()}-images/${
                     authState.entity?.photo
                   }?t=${new Date().getTime()}`}
                 />

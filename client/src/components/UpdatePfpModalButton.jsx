@@ -37,7 +37,7 @@ const UpdatePfpModalButton = ({ photoSrc }) => {
 
     const pfp = formData.get("pfp");
     if (pfp.size < 400 * 1024 || pfp.size > 2 * 1024 * 1024) {
-      setTimeNotification({ error: "PFP must be within 500KB and 2MB" });
+      setTimeNotification({ error: "PFP must be within 400KB and 2MB" });
       return;
     }
 
