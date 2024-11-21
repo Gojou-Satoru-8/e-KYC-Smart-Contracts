@@ -22,44 +22,22 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       { index: true, element: <LandingPage /> },
-      {
-        path: "/users",
-        children: [
-          { index: true, element: <HomePageUser /> },
-          { path: "/users/documents/:id", element: <DocPageUser /> },
-          { path: "/users/new-document", element: <NewDocPage /> },
-          { path: "/users/settings", element: <SettingsPage /> },
-        ],
-      },
-      {
-        path: "/organizations",
-        children: [
-          { index: true, element: <HomePageOrganization /> },
-          { path: "/organizations/settings", element: <SettingsPage /> },
-        ],
-      },
-      {
-        path: "/verifiers",
-        children: [
-          { index: true, element: <HomePageVerifier /> },
-          { path: "/verifiers/documents/:id", element: <DocPageVerifier /> },
-          { path: "/verifiers/settings", element: <SettingsPage /> },
-        ],
-      },
+      { path: "/users", element: <HomePageUser /> },
+      { path: "/users/documents/:id", element: <DocPageUser /> },
+      { path: "/users/new-document", element: <NewDocPage /> },
+      { path: "/users/settings", element: <SettingsPage /> },
+
+      { path: "/organizations", element: <HomePageOrganization /> },
+      { path: "/organizations/settings", element: <SettingsPage /> },
+      { path: "/verifiers", element: <HomePageVerifier /> },
+      { path: "/verifiers/documents/:id", element: <DocPageVerifier /> },
+      { path: "/verifiers/settings", element: <SettingsPage /> },
     ],
   },
-  {
-    path: "/login",
-    element: <LoginPage />,
-  },
-  {
-    path: "/verifiers/login",
-    element: <VerifierLoginSignupPage />,
-  },
-  {
-    path: "/signup",
-    element: <SignUpPage />,
-  },
+  { path: "/login", element: <LoginPage /> },
+  { path: "/signup", element: <SignUpPage /> },
+  { path: "/verifiers/login", element: <VerifierLoginSignupPage /> },
+
   { path: "/users/forgot-password", element: <ForgotPasswordPage userType={"User"} /> },
   {
     path: "/organizations/forgot-password",
