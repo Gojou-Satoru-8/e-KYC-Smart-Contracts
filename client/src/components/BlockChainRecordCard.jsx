@@ -13,10 +13,11 @@ import {
   TableRow,
   TableCell,
   getKeyValue,
+  Link,
 } from "@nextui-org/react";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { Form, Link } from "react-router-dom";
+import { Form } from "react-router-dom";
 import { authActions, documentsActions } from "../store";
 
 const ORIGIN = import.meta.env.VITE_API_BASE_URL;
@@ -129,13 +130,31 @@ const BlockChainRecordCard = ({ document, blockchainRecord, uiElements, setTimeN
   };
   return (
     <Card className="my-5">
-      <CardHeader className="justify-center mt-2">
+      <CardHeader className="flex-col gap-3 justify-center mt-2">
         <h3 className="text-2xl font-semibold leading-none text-default-600">Blockchain Record</h3>
-        <p>
-          <Link to="https://sepolia.etherscan.io/address/0x4d517fbf373ca7de4b643b7909a286c571ae13da#code">
-            View on Etherscan
+        <p>View details on Etherscan using the following links</p>
+        <div className="flex justify-center">
+          <Link
+            underline="hover"
+            isExternal
+            showAnchorIcon
+            isBlock
+            color="primary"
+            href="https://sepolia.etherscan.io/address/0x4d517fbf373ca7de4b643b7909a286c571ae13da#code"
+          >
+            Contract
           </Link>
-        </p>
+          <Link
+            underline="hover"
+            isExternal
+            showAnchorIcon
+            isBlock
+            color="primary"
+            href={`https://sepolia.etherscan.io/tx/${blockchainRecord.transactionHash}`}
+          >
+            Transaction
+          </Link>
+        </div>
       </CardHeader>
       <CardBody className="items-center">
         {/* Dynamic table from columns and rows array below: */}
