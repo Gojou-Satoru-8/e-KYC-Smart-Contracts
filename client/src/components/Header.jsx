@@ -18,7 +18,7 @@ import { authActions } from "../store/index.js";
 import { useState } from "react";
 import ThemeToggle from "./ThemeToggle.jsx";
 
-const Header = () => {
+const Header = ({ styles }) => {
   const dispatch = useDispatch();
   const authState = useSelector((state) => state.auth);
   const navigate = useNavigate();
@@ -45,10 +45,10 @@ const Header = () => {
   };
 
   return (
-    <header className="my-6">
+    <header className={`py-2 ${styles}`}>
       <Navbar
         isBordered
-        className="app-header w-[95%] sm:w-[90%] mx-auto my-2 rounded-3xl shadow-large"
+        className="app-header w-[95%] sm:w-[85%] mx-auto my-2 rounded-3xl shadow-large"
         isMenuOpen={isMenuOpen}
         onMenuOpenChange={setIsMenuOpen}
       >
@@ -57,7 +57,7 @@ const Header = () => {
         </NavbarContent> */}
         <NavbarContent className="items-center gap-8" justify="start">
           <NavbarBrand className={authState.isAuthenticated ? "justify-normal" : "justify-center"}>
-            <p className="font-bold text-inherit text-3xl text-purple-400">KYC Verification</p>
+            <p className="font-bold  text-3xl text-blue-400">e-KYC Verification</p>
           </NavbarBrand>
         </NavbarContent>
         {authState.isAuthenticated && (
@@ -83,7 +83,7 @@ const Header = () => {
                   showFallback
                   as="button"
                   className="transition-transform"
-                  color="secondary"
+                  color="primary"
                   name={authState.entity?.name
                     .split(" ")
                     .map((segment) => segment.at(0))

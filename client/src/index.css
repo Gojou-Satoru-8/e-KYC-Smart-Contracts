@@ -20,14 +20,15 @@ body {
 @layer components {
   /* Base layout */
   .app-layout {
-    @apply bg-gray-100 dark:bg-gray-900;
+    /* @apply bg-gray-100 dark:bg-gray-900; */
     /* @apply min-h-screen bg-white dark:bg-[#121C23]; */
+    @apply bg-[#EBF2FC] dark:bg-gray-900;
   }
 
   /* Card component */
   .app-card {
     /* @apply bg-white dark:bg-gray-800; */
-    @apply bg-white dark:bg-[#0E171E];
+    @apply bg-white dark:bg-[#101a22];
   }
 
   /* Sidebar component */

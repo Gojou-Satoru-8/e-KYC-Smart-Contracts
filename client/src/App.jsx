@@ -13,6 +13,7 @@ import DocPageVerifier from "./pages/DocPageVerifier";
 import NewDocPage from "./pages/NewDocPage";
 import SettingsPage from "./pages/SettingsPage";
 import HomePageVerifier from "./pages/HomePageVerifier";
+import LandingPage from "./pages/LandingPage";
 
 const router = createBrowserRouter([
   {
@@ -64,6 +65,7 @@ const router = createBrowserRouter([
     element: <ForgotPasswordPage userType={"Organization"} />,
   },
   { path: "/verifiers/forgot-password", element: <ForgotPasswordPage userType={"User"} /> },
+  { path: "/home", element: <LandingPage /> },
 ]);
 
 function App() {

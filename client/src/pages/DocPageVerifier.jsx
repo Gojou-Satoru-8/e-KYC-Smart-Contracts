@@ -222,8 +222,8 @@ const DocPageVerifier = () => {
               <Avatar
                 // size="lg"
                 className="w-24 h-24"
-                // isBordered
-                // color="secondary"
+                isBordered
+                color="primary"
                 showFallback
                 src={`http://localhost:3000/src/user-images/${
                   userInfo?.photo

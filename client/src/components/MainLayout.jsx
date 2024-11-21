@@ -7,7 +7,7 @@ const MainLayout = ({ children }) => {
     //   <Content title={title}>{children}</Content>
     // </main>
     // <main className="my-4 grid grid-cols-[20%_auto] grid-rows-1 w-full">{children}</main>
-    <main className="my-4 flex flex-row w-full h-[85vh]">{children}</main>
+    <main className="my-2 flex flex-row w-full h-[87vh]">{children}</main>
   );
 };
 

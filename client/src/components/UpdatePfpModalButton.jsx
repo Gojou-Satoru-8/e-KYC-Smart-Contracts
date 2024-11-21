@@ -83,9 +83,10 @@ const UpdatePfpModalButton = ({ photoSrc }) => {
       {!uiElements.loading && (
         <Avatar
           // size="lg"
+          as="button"
           className="w-24 h-24"
-          // isBordered
-          // color="secondary"
+          isBordered
+          color="primary"
           showFallback
           src={photoSrc}
           // name={userInfo.name}
