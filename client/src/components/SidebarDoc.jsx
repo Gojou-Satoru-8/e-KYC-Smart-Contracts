@@ -7,7 +7,8 @@ import BookIcon from "../assets/BookIcon";
 import IconWrapper from "./IconWrapper";
 import { useSelector } from "react-redux";
 
-// NOTE: This Sidebar component is for use with DocPageUser, DocPageVerifier and NewDocPage
+// NOTE: This Sidebar component is for use with DocPageUser, DocPageVerifier, NewDocPage and
+// HomePageOrganization
 const SidebarDoc = ({ styles, children }) => {
   const authState = useSelector((state) => state.auth);
   const isVerifiedUser = authState.entityType === "User" && authState.entity?.isVerified;

@@ -15,11 +15,12 @@ import {
   ModalFooter,
   ModalContent,
   useDisclosure,
-  Snippet,
+  // Snippet,
 } from "@nextui-org/react";
 import MainLayout from "../components/MainLayout";
 import SidebarDoc from "../components/SidebarDoc";
 import Content from "../components/Content";
+import BlockChainRecordCard from "../components/BlockChainRecordCard";
 import { useDispatch, useSelector } from "react-redux";
 import { MailIcon } from "../assets/MailIcon";
 import { UserIcon } from "../assets/UserIcon";
@@ -33,10 +34,7 @@ const DocPageVerifier = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [pdfUrl, setPdfUrl] = useState(null);
   const [uiElements, setUIElements] = useState({ loading: false, error: "", message: "" });
-  const [recordFromChainVerification, setRecordFromChainVerification] = useState({
-    documentHash: "",
-    verifiedAt: "",
-  });
+
   const rejectReasonRef = useRef(null);
 
   const document = useSelector((state) => {
@@ -138,7 +136,7 @@ const DocPageVerifier = () => {
       if (response.status === 401) {
         dispatch(authActions.unsetEntity());
         dispatch(documentsActions.clearAll());
-        navigate("/verifiers/login", { state: { message: "Time Out! Please log in again" } });
+        // navigate("/verifiers/login", { state: { message: "Time Out! Please log in again" } });
         return;
       }
 
@@ -154,46 +152,12 @@ const DocPageVerifier = () => {
     }
   };
 
-  const fetchChainVerifyRecord = async (URL) => {
-    try {
-      console.log(URL);
-      const response = await fetch(URL, { credentials: "include" });
-      console.log(response);
-      const data = await response.json();
-      console.log(data);
-
-      if (response.status === 401) {
-        dispatch(authActions.unsetEntity());
-        dispatch(documentsActions.clearAll());
-        // navigate("/login", { state: { message: "Time Out! Please log in again" } });
-        return;
-      }
-      if (!response.ok || data.status !== "success") {
-        setTimeNotification({ error: data.message }, 1.5);
-        return;
-      }
-
-      setTimeNotification({ message: data.message });
-      setRecordFromChainVerification({
-        documentHash: data.documentHash,
-        verifiedAt: data.verifiedAt,
-      });
-    } catch (err) {
-      console.log(err);
-      setTimeNotification({ error: err.message });
-    }
-  };
-  const handleVerifyRecord = async () => {
-    setTimeNotification({ loading: true });
-    fetchChainVerifyRecord(`http://localhost:3000/api/documents/verify/${document.id}`);
-  };
-
   return (
     <MainLayout>
       <SidebarDoc styles={"default"}>
         {uiElements.loading && (
           <div className="bg-primary rounded py-2 px-4">
-            <p>Processing! Please wait</p>
+            <p>Processing... Saving record on blockchain. This may take some time</p>
           </div>
         )}
         {uiElements.error && (
@@ -245,55 +209,13 @@ const DocPageVerifier = () => {
         </Card>
 
         {blockchainRecord && (
-          <Card className="my-5">
-            <CardHeader className="justify-center mt-2">
-              <h3 className="text-2xl font-semibold leading-none text-default-600">
-                Blockchain Record
-              </h3>
-            </CardHeader>
-            <CardBody className="">
-              <ul className="list-disc px-10 flex flex-col gap-2">
-                <li>
-                  Transaction Hash: <Snippet size="sm">{blockchainRecord.transactionHash}</Snippet>
-                </li>
-                <li>
-                  Document ID Hash: <Snippet size="sm">{blockchainRecord.documentIdHash}</Snippet>
-                </li>
-                <li>
-                  Document Hash: <Snippet size="sm">{blockchainRecord.documentHash}</Snippet>
-                </li>
-                <li>
-                  Block Hash: <Snippet size="sm">{blockchainRecord.blockHash}</Snippet>
-                </li>
-                <li>
-                  Recorded At{" "}
-                  {new Date(blockchainRecord.recordedAt).toLocaleString("en-UK", {
-                    timeZone: "Asia/Kolkata",
-                  })}
-                </li>
-              </ul>
-            </CardBody>
-            <CardFooter className="flex-col justify-center mb-2 gap-5">
-              <Button onClick={handleVerifyRecord}>Auto Verify Record</Button>
-
-              {recordFromChainVerification.documentHash && (
-                <ul className="list-disc px-10 flex flex-col gap-2 my-5">
-                  <li>
-                    Document Hash:{" "}
-                    <Snippet size="sm">{recordFromChainVerification.documentHash}</Snippet>
-                  </li>
-                  <li>
-                    Recorded At{" "}
-                    {new Date(recordFromChainVerification.verifiedAt).toLocaleString("en-UK", {
-                      timeZone: "Asia/Kolkata",
-                    })}
-                  </li>
-                </ul>
-              )}
-            </CardFooter>
-          </Card>
+          <BlockChainRecordCard
+            document={document}
+            blockchainRecord={blockchainRecord}
+            uiElements={uiElements}
+            setTimeNotification={setTimeNotification}
+          />
         )}
-
         <div className="mt-10 m-auto">
           <Card>
             <CardHeader className="flex-col justify-center pt-10 px-20 gap-4 text-center">
@@ -363,21 +285,6 @@ const DocPageVerifier = () => {
             </CardBody>
             {document?.status === "Pending" && (
               <CardFooter className="flex flex-col gap-5">
-                {uiElements.loading && (
-                  <div className="bg-primary rounded py-2 px-4">
-                    <p>Processing! Please wait</p>
-                  </div>
-                )}
-                {uiElements.error && (
-                  <div className="bg-danger rounded py-2 px-4">
-                    <p>{uiElements.error}</p>
-                  </div>
-                )}
-                {uiElements.message && (
-                  <div className="bg-success rounded py-2 px-4">
-                    <p>{uiElements.message}</p>
-                  </div>
-                )}
                 <Divider />
                 <div className="flex flex-row justify-center gap-8 m-auto">
                   <Button type="button" color="danger" onPress={onOpen}>
@@ -402,7 +309,7 @@ const DocPageVerifier = () => {
                           <ModalBody className="flex flex-col gap-4 text-center">
                             {uiElements.loading && (
                               <div className="bg-primary rounded-lg py-2 px-4">
-                                <p>Saving! Please wait</p>
+                                <p>Processing! Please wait</p>
                               </div>
                             )}
                             {uiElements.error && (
