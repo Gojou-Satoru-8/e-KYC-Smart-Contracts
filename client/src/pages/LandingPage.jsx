@@ -1,84 +1,17 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@nextui-org/react";
-import Header from "../components/Header";
-import AnimatedWaves from "../components/AnimatedWaves";
+import { LeftWaves, BottomWaves, EnhancedBottomWaves } from "../components/AnimatedWaves";
 import HeroImage from "../assets/hero-img.png";
 const LandingPage = () => {
   const navigate = useNavigate();
   return (
     <>
-      <Header />
       <div className="relative min-h-screen app-layout overflow-hidden">
         {/* Animated Waves */}
-        {/* <div className="absolute left-0 top-0 h-full w-1/3 overflow-hidden pointer-events-none">
-          <motion.svg
-            viewBox="0 0 100 800"
-            className="absolute h-full w-full opacity-10"
-            preserveAspectRatio="none"
-            initial={{ x: -50 }}
-            animate={{ x: 0 }}
-            transition={{
-              repeat: Infinity,
-              duration: 20,
-              ease: "linear",
-            }}
-          >
-            <motion.path
-              d="M0,800 C20,750 40,700 50,650 C60,600 80,550 100,500 C120,450 140,400 150,350 C160,300 180,250 200,200 C220,150 240,100 250,50 C260,0 280,-50 300,-100"
-              fill="none"
-              stroke="rgb(59, 130, 246)"
-              strokeWidth="2"
-              className="opacity-30"
-              animate={{
-                d: [
-                  "M0,800 C20,750 40,700 50,650 C60,600 80,550 100,500 C120,450 140,400 150,350 C160,300 180,250 200,200 C220,150 240,100 250,50 C260,0 280,-50 300,-100",
-                  "M-50,800 C-30,750 -10,700 0,650 C10,600 30,550 50,500 C70,450 90,400 100,350 C110,300 130,250 150,200 C170,150 190,100 200,50 C210,0 230,-50 250,-100",
-                ],
-              }}
-              transition={{
-                repeat: Infinity,
-                duration: 10,
-                ease: "easeInOut",
-                repeatType: "reverse",
-              }}
-            />
-          </motion.svg>
-
-          <motion.svg
-            viewBox="0 0 100 800"
-            className="absolute h-full w-full opacity-20"
-            preserveAspectRatio="none"
-            initial={{ x: -30 }}
-            animate={{ x: 0 }}
-            transition={{
-              repeat: Infinity,
-              duration: 15,
-              ease: "linear",
-            }}
-          >
-            <motion.path
-              d="M-100,800 C-80,750 -60,700 -50,650 C-40,600 -20,550 0,500 C20,450 40,400 50,350 C60,300 80,250 100,200 C120,150 140,100 150,50 C160,0 180,-50 200,-100"
-              fill="none"
-              stroke="rgb(59, 130, 246)"
-              strokeWidth="2"
-              className="opacity-40"
-              animate={{
-                d: [
-                  "M-100,800 C-80,750 -60,700 -50,650 C-40,600 -20,550 0,500 C20,450 40,400 50,350 C60,300 80,250 100,200 C120,150 140,100 150,50 C160,0 180,-50 200,-100",
-                  "M-150,800 C-130,750 -110,700 -100,650 C-90,600 -70,550 -50,500 C-30,450 -10,400 0,350 C10,300 30,250 50,200 C70,150 90,100 100,50 C110,0 130,-50 150,-100",
-                ],
-              }}
-              transition={{
-                repeat: Infinity,
-                duration: 8,
-                ease: "easeInOut",
-                repeatType: "reverse",
-              }}
-            />
-          </motion.svg>
-        </div> */}
-        <AnimatedWaves />
+        {/* <LeftWaves /> */}
+        {/* <BottomWaves /> */}
+        <EnhancedBottomWaves />
         {/* Main content container */}
         <div className="container mx-auto px-4 py-16 flex flex-col md:flex-row items-center justify-between relative z-10">
           {/* Left side - Text content */}

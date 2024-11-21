@@ -60,6 +60,11 @@ const Header = ({ styles }) => {
             <p className="font-bold  text-3xl text-blue-400">e-KYC Verification</p>
           </NavbarBrand>
         </NavbarContent>
+
+        <NavbarContent className="items-center" justify="center">
+          <ThemeToggle />
+        </NavbarContent>
+
         {authState.isAuthenticated && (
           <NavbarContent className="gap-8" justify="end">
             {/* <Input
@@ -75,7 +80,7 @@ const Header = ({ styles }) => {
               startContent={<SearchIcon size={18} />}
               type="search"
             /> */}
-            <ThemeToggle />
+
             <Dropdown placement="bottom-end">
               <DropdownTrigger>
                 <Avatar

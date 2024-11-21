@@ -10,10 +10,10 @@ const usePopulateDocuments = (entityType) => {
   console.log(documentsState);
 
   useEffect(() => {
-    // ONLY FETCH DOCUMENTS IN CASE OF USER OR VERIFIER LOG IN:
+    // ONLY FETCH DOCUMENTS IN CASE OF USER OR VERIFIER BEING LOGGED IN:
     if (entityType !== "User" && entityType !== "Verifier") return;
-    // This covers the case of entityType being "Organization" or entityType being null, in case of first load
-    // where authState.entityType has the initial value of null.
+    // This covers the case of entityType being "Organization" or entityType being null (in case of first load
+    // or when no entity is logged in).
     const fetchAllDocuments = async () => {
       let URL = "http://localhost:3000/api/documents";
       if (entityType === "Verifier") URL += "/all";

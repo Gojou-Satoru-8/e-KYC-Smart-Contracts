@@ -21,6 +21,7 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     errorElement: <ErrorPage />,
     children: [
+      { index: true, element: <LandingPage /> },
       {
         path: "/users",
         children: [
@@ -65,7 +66,7 @@ const router = createBrowserRouter([
     element: <ForgotPasswordPage userType={"Organization"} />,
   },
   { path: "/verifiers/forgot-password", element: <ForgotPasswordPage userType={"User"} /> },
-  { path: "/home", element: <LandingPage /> },
+  // { path: "/home", element: <LandingPage /> },
 ]);
 
 function App() {

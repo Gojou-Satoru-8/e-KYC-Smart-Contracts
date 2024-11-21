@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 
 // For protected routes that need login:
-export const useRedirectIfNotAuthenticated = (redirectUrl = "/login") => {
+export const useRedirectIfNotAuthenticated = (redirectUrl = "/") => {
   const authState = useSelector((state) => state.auth);
   const navigate = useNavigate();
   useEffect(() => {
@@ -12,7 +12,8 @@ export const useRedirectIfNotAuthenticated = (redirectUrl = "/login") => {
   return authState;
 };
 
-// For routes like /login and /signup that redirect to home (/ route) if already logged in:
+// For routes like /login and /signup that should redirect to home (/ route) if already logged in
+// Once redirected, the redirectToCorrectHome hook is used to carry the entity to the appropriate home=page
 export const useRedirectIfAuthenticated = (redirectUrl = "/") => {
   const authState = useSelector((state) => state.auth);
   const navigate = useNavigate();
@@ -22,19 +23,22 @@ export const useRedirectIfAuthenticated = (redirectUrl = "/") => {
   return authState;
 };
 
+// Redirects authenticated entities to their correct home-pages:
 export const useRedirectToCorrectHome = () => {
   const authState = useSelector((state) => state.auth);
   const location = useLocation();
   const navigate = useNavigate();
   useEffect(() => {
     if (!authState.isAuthenticated) return;
-    // Redirect / to correct home page (/users or /organizations or /verifiers):
+
+    // (1) Redirect / to correct home page (/users or /organizations or /verifiers):
     if (location.pathname === "/") {
       if (authState.entityType === "User") navigate("/users");
       else if (authState.entityType === "Organization") navigate("/organizations");
       else if (authState.entityType === "Verifier") navigate("/verifiers");
     }
-    // Redirect unauthorized entities:
+
+    // (2) Redirect unauthorized entities:
     // if (location.pathname.startsWith("/organizations") && authState.entityType !== "Organization")
     //   navigate(`/${authState.entityType}s`);
     // if (location.pathname.startsWith("/users") && authState.entityType !== "User")
