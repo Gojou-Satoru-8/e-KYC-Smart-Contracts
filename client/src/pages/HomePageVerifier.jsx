@@ -11,6 +11,7 @@ import HomeFeedSkeletons from "./HomeFeedSkeletons";
 
 const statusColor = { Pending: "warning", Approved: "success", Rejected: "danger" };
 
+const ORIGIN = import.meta.env.VITE_API_BASE_URL;
 const HomePageVerifier = ({ userType }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -24,9 +25,9 @@ const HomePageVerifier = ({ userType }) => {
   if (selectedTags?.length === 0) documentsToDisplay = [...documents];
   else documentsToDisplay = documents.filter((doc) => selectedTags.includes(doc.status));
   const handleViewDoc = async (id) => {
-    // window.location.href = `http://localhost:3000/api/documents/${id}`;  // Opens in same tab
-    // window.location.assign(`http://localhost:3000/api/documents/${id}`); // Opens in same tab
-    // window.open(`http://localhost:3000/api/documents/${id}`, "_blank"); // Opens in a new tab
+    // window.location.href = `${ORIGIN}/api/documents/${id}`;  // Opens in same tab
+    // window.location.assign(`${ORIGIN}/api/documents/${id}`); // Opens in same tab
+    // window.open(`${ORIGIN}/api/documents/${id}`, "_blank"); // Opens in a new tab
     // (_blank option is not strictly necessary)
     navigate(`/verifiers/documents/${id}`);
   };

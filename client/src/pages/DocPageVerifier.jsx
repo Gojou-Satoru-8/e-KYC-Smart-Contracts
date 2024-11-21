@@ -27,6 +27,7 @@ import { UserIcon } from "../assets/UserIcon";
 import PhoneIcon from "../assets/PhoneIcon";
 import { authActions, documentsActions } from "../store";
 
+const ORIGIN = import.meta.env.VITE_API_BASE_URL;
 const DocPageVerifier = () => {
   const params = useParams();
   const navigate = useNavigate();
@@ -75,7 +76,7 @@ const DocPageVerifier = () => {
   useEffect(() => {
     const downloadDoc = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/documents/${params.id}`, {
+        const response = await fetch(`${ORIGIN}/api/documents/${params.id}`, {
           credentials: "include",
         });
         if (response.status === 401) {
@@ -123,7 +124,7 @@ const DocPageVerifier = () => {
 
     setTimeNotification({ loading: true });
     try {
-      const response = await fetch(`http://localhost:3000/api/documents/all/${document?._id}`, {
+      const response = await fetch(`${ORIGIN}/api/documents/all/${document?._id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -225,9 +226,7 @@ const DocPageVerifier = () => {
                 isBordered
                 color="primary"
                 showFallback
-                src={`http://localhost:3000/uploads/user-images/${
-                  userInfo?.photo
-                }?t=${new Date().getTime()}`}
+                src={`${ORIGIN}/uploads/user-images/${userInfo?.photo}?t=${new Date().getTime()}`}
                 // name={authState.entity.name}
               />
               <h3 className="text-3xl text-center">User Information</h3>
@@ -334,6 +333,7 @@ const DocPageVerifier = () => {
                               type="button"
                               color="danger"
                               // variant="light"
+                              isDisabled={uiElements.loading}
                               onClick={(e) => handleUpdateDocStatus("Rejected")}
                             >
                               Reject
@@ -347,6 +347,7 @@ const DocPageVerifier = () => {
                   <Button
                     type="button"
                     color="success"
+                    isDisabled={uiElements.loading}
                     onClick={(e) => handleUpdateDocStatus("Approved")}
                   >
                     Approve

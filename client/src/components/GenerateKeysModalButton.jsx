@@ -17,6 +17,7 @@ import { authActions, documentsActions } from "../store";
 import { CopyIcon, CheckIcon } from "../assets/CopyIcons";
 import { EyeFilledIcon, EyeSlashFilledIcon } from "../assets/EyeIconsPassword";
 
+const ORIGIN = import.meta.env.VITE_API_BASE_URL;
 function generateKeyPair() {
   // Generate the key pair synchronously
   const keypair = pki.rsa.generateKeyPair({ bits: 2048 });
@@ -75,7 +76,7 @@ const GenerateKeysModalButton = () => {
   const getPublicKeyResetTokenMail = async () => {
     setTokenState({ tokenMsg: "Trying to mail your Token...", tokenSent: false });
     try {
-      const response = await fetch("http://localhost:3000/api/users/generate-key-token", {
+      const response = await fetch(`${ORIGIN}/api/users/generate-key-token`, {
         credentials: "include",
       });
       console.log(response);
@@ -117,7 +118,7 @@ const GenerateKeysModalButton = () => {
     console.log("Private Key:", keys.privateKeyPem);
 
     try {
-      const response = await fetch("http://localhost:3000/api/users/update-key", {
+      const response = await fetch(`${ORIGIN}/api/users/update-key`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

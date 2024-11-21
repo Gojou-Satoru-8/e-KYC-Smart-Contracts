@@ -3,6 +3,8 @@ import Header from "../components/Header";
 import { useRedirectIfNotAuthenticated, useRedirectToCorrectHome } from "../hooks/checkAuthHooks";
 import usePopulateDocuments from "../hooks/usePopulateDocuments";
 const RootLayout = () => {
+  console.log(import.meta.env);
+
   // Redirects to Landing Page if not logged in
   const authState = useRedirectIfNotAuthenticated();
   const documentsState = usePopulateDocuments(authState.entityType);

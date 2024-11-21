@@ -22,6 +22,7 @@ import { MailIcon } from "../assets/MailIcon";
 import PhoneIcon from "../assets/PhoneIcon";
 // import { EyeFilledIcon, EyeSlashFilledIcon } from "../assets/EyeIconsPassword";
 
+const ORIGIN = import.meta.env.VITE_API_BASE_URL;
 const SettingsOrganization = () => {
   // const [eyeIconVisible, setEyeIconVisible] = useState(false);
   const authState = useSelector((state) => state.auth);
@@ -78,7 +79,7 @@ const SettingsOrganization = () => {
     setMessage("");
 
     try {
-      const response = await fetch("http://localhost:3000/api/organizations/", {
+      const response = await fetch(`${ORIGIN}/api/organizations/`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: organizationInfo.username, name: organizationInfo.name }),
@@ -132,7 +133,7 @@ const SettingsOrganization = () => {
                 classNames={{ name: "text-4xl" }}
                 className="w-24 h-24"
                 showFallback
-                src={`http://localhost:3000/src/organization-images/${
+                src={`${ORIGIN}/src/organization-images/${
                   authState.entity?.photo
                 }?t=${new Date().getTime()}`}
                 name={organizationInfo.name
@@ -141,7 +142,7 @@ const SettingsOrganization = () => {
                   .join("")}
               />
               {/* <UpdatePfpModalButton
-                  photoSrc={`http://localhost:3000/src/user-images/${
+                  photoSrc={`${ORIGIN}/src/user-images/${
                     authState.entity?.photo
                   }?t=${new Date().getTime()}`}
                 /> */}

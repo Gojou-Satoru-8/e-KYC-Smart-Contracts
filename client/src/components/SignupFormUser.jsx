@@ -6,6 +6,7 @@ import { UserIcon } from "../assets/UserIcon";
 import { EyeFilledIcon, EyeSlashFilledIcon } from "../assets/EyeIconsPassword";
 import PhoneIcon from "../assets/PhoneIcon";
 
+const ORIGIN = import.meta.env.VITE_API_BASE_URL;
 const validatePassword = (password, passwordConfirm) => {
   const errors = [];
   if (password.length < 8 || password.length > 20)
@@ -49,7 +50,7 @@ const SignupFormUser = ({ setUIElements, setTimeNotification }) => {
 
     // NOTE: Rest of the validations happen on the server-side
     try {
-      const response = await fetch("http://localhost:3000/api/users/signup", {
+      const response = await fetch(`${ORIGIN}/api/users/signup`, {
         method: "POST", // POST
         body: JSON.stringify(formDataObj),
         headers: { "Content-Type": "application/json" },

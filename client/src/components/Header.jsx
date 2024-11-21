@@ -18,6 +18,7 @@ import { authActions } from "../store/index.js";
 import { useState } from "react";
 import ThemeToggle from "./ThemeToggle.jsx";
 
+const ORIGIN = import.meta.env.VITE_API_BASE_URL;
 const Header = ({ styles }) => {
   const dispatch = useDispatch();
   const authState = useSelector((state) => state.auth);
@@ -26,10 +27,9 @@ const Header = ({ styles }) => {
   const handleLogout = async () => {
     try {
       const { entityType } = authState;
-      const response = await fetch(
-        `http://localhost:3000/api/${entityType.toLowerCase()}s/logout`,
-        { credentials: "include" }
-      );
+      const response = await fetch(`${ORIGIN}/api/${entityType.toLowerCase()}s/logout`, {
+        credentials: "include",
+      });
       if (!response.ok) {
         alert("Unable to log out! Server Issue");
         return;
@@ -97,7 +97,7 @@ const Header = ({ styles }) => {
                     .join("")}
                   // Here we're taking initials of each segment of name
                   size="sm"
-                  src={`http://localhost:3000/uploads/${authState.entityType?.toLowerCase()}-images/${
+                  src={`${ORIGIN}/uploads/${authState.entityType?.toLowerCase()}-images/${
                     authState.entity?.photo
                   }?t=${new Date().getTime()}`}
                 />

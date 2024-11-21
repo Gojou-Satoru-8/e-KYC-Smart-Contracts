@@ -21,6 +21,7 @@ import BlockChainRecordCard from "../components/BlockChainRecordCard";
 import { authActions, documentsActions } from "../store";
 import { CheckIcon, CopyIcon } from "../assets/CopyIcons";
 
+const ORIGIN = import.meta.env.VITE_API_BASE_URL;
 const DocPageUser = () => {
   const params = useParams();
   const dispatch = useDispatch();
@@ -50,7 +51,7 @@ const DocPageUser = () => {
   useEffect(() => {
     const downloadDoc = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/documents/${params.id}`, {
+        const response = await fetch(`${ORIGIN}/api/documents/${params.id}`, {
           credentials: "include",
         });
         console.log(response);
@@ -103,7 +104,7 @@ const DocPageUser = () => {
 
     setTimeNotification({ loading: true });
     try {
-      const response = await fetch("http://localhost:3000/api/documents/share", {
+      const response = await fetch(`${ORIGIN}/api/documents/share`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formDataObj),

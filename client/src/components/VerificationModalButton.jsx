@@ -14,6 +14,7 @@ import { Form, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { authActions, documentsActions } from "../store";
 
+const ORIGIN = import.meta.env.VITE_API_BASE_URL;
 const VerificationModalButton = ({ property }) => {
   // NOTE: Property is either "email" or "phone"
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
@@ -35,10 +36,9 @@ const VerificationModalButton = ({ property }) => {
       tokenSent: false,
     });
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/users/${property}-verification-token`,
-        { credentials: "include" }
-      );
+      const response = await fetch(`${ORIGIN}/api/users/${property}-verification-token`, {
+        credentials: "include",
+      });
       console.log(response);
       const data = await response.json();
       console.log(data);
@@ -72,15 +72,12 @@ const VerificationModalButton = ({ property }) => {
     }
 
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/users/${property}-verification-token`,
-        {
-          method: "POST",
-          body: JSON.stringify(formDataObj),
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`${ORIGIN}/api/users/${property}-verification-token`, {
+        method: "POST",
+        body: JSON.stringify(formDataObj),
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
 
       const data = await response.json();
       console.log(data);

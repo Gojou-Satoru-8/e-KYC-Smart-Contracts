@@ -10,6 +10,7 @@ import { authActions, documentsActions } from "../store";
 import HomeFeedSkeletons from "./HomeFeedSkeletons";
 const statusColor = { Pending: "warning", Approved: "success", Rejected: "danger" };
 
+const ORIGIN = import.meta.env.VITE_API_BASE_URL;
 // const HomePageUser = ({ userType }) => {
 const HomePageUser = () => {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ const HomePageUser = () => {
   };
 
   const handleDeleteDocument = async (id) => {
-    const response = await fetch(`http://localhost:3000/api/documents/${id}`, {
+    const response = await fetch(`${ORIGIN}/api/documents/${id}`, {
       method: "DELETE",
       credentials: "include",
     });

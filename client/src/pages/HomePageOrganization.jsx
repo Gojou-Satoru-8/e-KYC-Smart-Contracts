@@ -2,28 +2,13 @@ import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, Link, Form } from "react-router-dom";
 import MainLayout from "../components/MainLayout";
-import SidebarHome from "../components/SidebarHome";
 import Content from "../components/Content";
-// import { useEffect, useState } from "react";
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  Input,
-  Button,
-  CardFooter,
-  Textarea,
-  Snippet,
-} from "@nextui-org/react";
-
-// import usePopulateDocumentsTodocumentsToDisplay from "../hooks/usePopulateDocumentsTodocumentsToDisplay";
-// import { useRedirectIfNotAuthenticated } from "../hooks/checkAuthHooks";
+import { Card, CardHeader, CardBody, Button, CardFooter, Textarea } from "@nextui-org/react";
 import { authActions, documentsActions } from "../store";
 import BlockChainRecordCard from "../components/BlockChainRecordCard";
 import SidebarDoc from "../components/SidebarDoc";
-// import CloseIcon from "../assets/close.png";
 
-const statusColor = { Pending: "warning", Approved: "success", Rejected: "danger" };
+const ORIGIN = import.meta.env.VITE_API_BASE_URL;
 
 const HomePageOrganization = ({ userType }) => {
   const navigate = useNavigate();
@@ -52,7 +37,7 @@ const HomePageOrganization = ({ userType }) => {
   //   useEffect(() => {
   const downloadDoc = async (id) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/documents/${id}`, {
+      const response = await fetch(`${ORIGIN}/api/documents/${id}`, {
         credentials: "include",
       });
       console.log(response);
@@ -89,7 +74,7 @@ const HomePageOrganization = ({ userType }) => {
 
     setTimeNotification({ loading: true });
     try {
-      const response = await fetch(`http://localhost:3000/api/documents/share/${shareToken}`, {
+      const response = await fetch(`${ORIGIN}/api/documents/share/${shareToken}`, {
         credentials: "include",
       });
       console.log(response);

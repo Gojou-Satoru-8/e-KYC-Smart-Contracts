@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { authActions, documentsActions } from "../store";
 import { useNavigate } from "react-router-dom";
 
+const ORIGIN = import.meta.env.VITE_API_BASE_URL;
 const usePopulateDocuments = (entityType) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -15,7 +16,7 @@ const usePopulateDocuments = (entityType) => {
     // This covers the case of entityType being "Organization" or entityType being null (in case of first load
     // or when no entity is logged in).
     const fetchAllDocuments = async () => {
-      let URL = "http://localhost:3000/api/documents";
+      let URL = `${ORIGIN}/api/documents`;
       if (entityType === "Verifier") URL += "/all";
       try {
         const response = await fetch(URL, { credentials: "include" });

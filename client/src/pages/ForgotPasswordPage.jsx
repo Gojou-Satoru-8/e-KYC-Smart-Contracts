@@ -7,6 +7,7 @@ import { MailIcon } from "../assets/MailIcon";
 import { EyeFilledIcon, EyeSlashFilledIcon } from "../assets/EyeIconsPassword";
 import { useRedirectIfAuthenticated } from "../hooks/checkAuthHooks";
 
+const ORIGIN = import.meta.env.VITE_API_BASE_URL;
 const validatePassword = (password) => {
   const errors = [];
   if (password.length < 8 || password.length > 20)
@@ -61,7 +62,7 @@ const ForgotPasswordPage = ({ userType }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/api/${userType.toLowerCase()}s/generate-password-token`,
+        `${ORIGIN}/api/${userType.toLowerCase()}s/generate-password-token`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -111,15 +112,12 @@ const ForgotPasswordPage = ({ userType }) => {
       return;
     }
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/${userType.toLowerCase()}s/reset-password`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formDataObj),
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`${ORIGIN}/api/${userType.toLowerCase()}s/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formDataObj),
+        credentials: "include",
+      });
 
       const data = await response.json();
       if (!response.ok || data.status !== "success") {

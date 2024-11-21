@@ -22,6 +22,7 @@ import { UserIcon } from "../assets/UserIcon";
 // import PhoneIcon from "../assets/PhoneIcon";
 // import { EyeFilledIcon, EyeSlashFilledIcon } from "../assets/EyeIconsPassword";
 
+const ORIGIN = import.meta.env.VITE_API_BASE_URL;
 const SettingsVerifier = () => {
   // const [eyeIconVisible, setEyeIconVisible] = useState(false);
   const authState = useSelector((state) => state.auth);
@@ -78,7 +79,7 @@ const SettingsVerifier = () => {
     setMessage("");
 
     try {
-      const response = await fetch("http://localhost:3000/api/verifiers/", {
+      const response = await fetch(`${ORIGIN}/api/verifiers/`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: verifierInfo.username, name: verifierInfo.name }),
@@ -132,7 +133,7 @@ const SettingsVerifier = () => {
                 classNames={{ name: "text-4xl" }}
                 className="w-24 h-24"
                 showFallback
-                src={`http://localhost:3000/src/verifier-images/${
+                src={`${ORIGIN}/src/verifier-images/${
                   authState.entity?.photo
                 }?t=${new Date().getTime()}`}
                 name={verifierInfo.name
@@ -141,7 +142,7 @@ const SettingsVerifier = () => {
                   .join("")}
               />
               {/* <UpdatePfpModalButton
-                photoSrc={`http://localhost:3000/src/user-images/${
+                photoSrc={`${ORIGIN}/src/user-images/${
                   authState.entity?.photo
                 }?t=${new Date().getTime()}`}
               /> */}

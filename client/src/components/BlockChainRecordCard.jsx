@@ -16,9 +16,10 @@ import {
 } from "@nextui-org/react";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { Form } from "react-router-dom";
+import { Form, Link } from "react-router-dom";
 import { authActions, documentsActions } from "../store";
 
+const ORIGIN = import.meta.env.VITE_API_BASE_URL;
 const columns = [
   { key: "field", label: "Field" },
   { key: "value", label: "Value" },
@@ -111,7 +112,7 @@ const BlockChainRecordCard = ({ document, blockchainRecord, uiElements, setTimeN
   };
   const handleVerifyRecord = async () => {
     setTimeNotification({ loading: true });
-    fetchChainVerifyRecord(`http://localhost:3000/api/documents/verify/${document.id}`);
+    fetchChainVerifyRecord(`${ORIGIN}/api/documents/verify/${document.id}`);
   };
   const handleVerifyRecordManual = (e) => {
     setTimeNotification({ loading: true });
@@ -124,14 +125,17 @@ const BlockChainRecordCard = ({ document, blockchainRecord, uiElements, setTimeN
       setTimeNotification({ error: "Please enter the correct Document ID" });
       return;
     }
-    fetchChainVerifyRecord(
-      `http://localhost:3000/api/documents/verify/${documentIdHash}?type=hash`
-    );
+    fetchChainVerifyRecord(`${ORIGIN}/api/documents/verify/${documentIdHash}?type=hash`);
   };
   return (
     <Card className="my-5">
       <CardHeader className="justify-center mt-2">
         <h3 className="text-2xl font-semibold leading-none text-default-600">Blockchain Record</h3>
+        <p>
+          <Link to="https://sepolia.etherscan.io/address/0x4d517fbf373ca7de4b643b7909a286c571ae13da#code">
+            View on Etherscan
+          </Link>
+        </p>
       </CardHeader>
       <CardBody className="items-center">
         {/* Dynamic table from columns and rows array below: */}

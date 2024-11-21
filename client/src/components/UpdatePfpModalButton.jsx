@@ -14,6 +14,7 @@ import { Form, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { authActions, documentsActions } from "../store";
 
+const ORIGIN = import.meta.env.VITE_API_BASE_URL;
 const UpdatePfpModalButton = ({ photoSrc }) => {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const authState = useSelector((state) => state.auth);
@@ -42,7 +43,7 @@ const UpdatePfpModalButton = ({ photoSrc }) => {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/api/users/update-pfp", {
+      const response = await fetch(`${ORIGIN}/api/users/update-pfp`, {
         method: "POST",
         body: formData,
         credentials: "include",

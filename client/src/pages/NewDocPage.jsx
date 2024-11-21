@@ -8,7 +8,10 @@ import SidebarDoc from "../components/SidebarDoc";
 import Content from "../components/Content";
 import { authActions, documentsActions } from "../store";
 import { signDocument } from "../utils/crypto";
+
 const docTypes = ["Passport", "Voter ID", "Driver License", "Aadhar", "PAN", "NRC", "PRC"];
+const ORIGIN = import.meta.env.VITE_API_BASE_URL;
+
 const NewDocPage = () => {
   // console.log("New Note:", isNew);
 
@@ -113,7 +116,7 @@ const NewDocPage = () => {
       console.log(Object.fromEntries(formData)); // Just to check the inputs
       // setUIElements({ loading: true, message: "", error: "" });
 
-      let URL = "http://localhost:3000/api/documents/";
+      let URL = `${ORIGIN}/api/documents/`;
 
       const response = await fetch(URL, {
         method: "POST",

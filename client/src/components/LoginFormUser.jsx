@@ -7,6 +7,7 @@ import { EyeSlashFilledIcon, EyeFilledIcon } from "../assets/EyeIconsPassword";
 import { authActions } from "../store";
 import { useState } from "react";
 
+const ORIGIN = import.meta.env.VITE_API_BASE_URL;
 const LoginFormUser = ({ setUIElements, setTimeNotification }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -29,7 +30,7 @@ const LoginFormUser = ({ setUIElements, setTimeNotification }) => {
 
     const formDataObj = Object.fromEntries(formData);
     try {
-      const response = await fetch("http://localhost:3000/api/users/login", {
+      const response = await fetch(`${ORIGIN}/api/users/login`, {
         method: "POST", // POST
         body: JSON.stringify(formDataObj),
         headers: { "Content-Type": "application/json" },

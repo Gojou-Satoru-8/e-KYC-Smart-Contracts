@@ -14,6 +14,7 @@ import { EyeFilledIcon, EyeSlashFilledIcon } from "../assets/EyeIconsPassword";
 import { useDispatch, useSelector } from "react-redux";
 import { authActions, documentsActions } from "../store";
 
+const ORIGIN = import.meta.env.VITE_API_BASE_URL;
 const validatePassword = (currentPassword, newPassword) => {
   const errors = [];
   if (currentPassword === newPassword)
@@ -69,7 +70,7 @@ const ChangePasswordModalButton = ({ userType }) => {
     setTokenState({ tokenSent: false, tokenMsg: "Trying to mail your Token" });
     try {
       const response = await fetch(
-        `http://localhost:3000/api/${userType.toLowerCase()}s/generate-password-token`,
+        `${ORIGIN}/api/${userType.toLowerCase()}s/generate-password-token`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -111,15 +112,12 @@ const ChangePasswordModalButton = ({ userType }) => {
       return;
     }
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/${userType.toLowerCase()}s/update-password`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formDataObj),
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`${ORIGIN}/api/${userType.toLowerCase()}s/update-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formDataObj),
+        credentials: "include",
+      });
 
       const data = await response.json();
 

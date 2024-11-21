@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { authActions } from "../store";
 
+const ORIGIN = import.meta.env.VITE_API_BASE_URL;
 const useGetCurrentUser = () => {
   const authState = useSelector((state) => state.auth);
   console.log("Authentication status: ", authState);
@@ -11,7 +12,7 @@ const useGetCurrentUser = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/entity", {
+        const response = await fetch(`${ORIGIN}/api/entity`, {
           credentials: "include",
         });
         console.log(response);

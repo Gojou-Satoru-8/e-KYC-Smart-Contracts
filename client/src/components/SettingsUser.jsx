@@ -23,6 +23,7 @@ import { UserIcon } from "../assets/UserIcon";
 import PhoneIcon from "../assets/PhoneIcon";
 // import { EyeFilledIcon, EyeSlashFilledIcon } from "../assets/EyeIconsPassword";
 
+const ORIGIN = import.meta.env.VITE_API_BASE_URL;
 const SettingsUser = () => {
   // const [eyeIconVisible, setEyeIconVisible] = useState(false);
   const authState = useSelector((state) => state.auth);
@@ -79,7 +80,7 @@ const SettingsUser = () => {
     setMessage("");
 
     try {
-      const response = await fetch("http://localhost:3000/api/users/", {
+      const response = await fetch(`${ORIGIN}/api/users/`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: userInfo.username, name: userInfo.name }),
@@ -131,11 +132,13 @@ const SettingsUser = () => {
                 // isBordered
                 // color="secondary"
                 // showFallback
-                src={authState.entity?.photo}
+                src={`${ORIGIN}/uploads/user-images/${
+                  authState.entity?.photo
+                }?t=${new Date().getTime()}`}
                 // name={userInfo.name}
               ></Avatar> */}
               <UpdatePfpModalButton
-                photoSrc={`http://localhost:3000/uploads/user-images/${
+                photoSrc={`${ORIGIN}/uploads/user-images/${
                   authState.entity?.photo
                 }?t=${new Date().getTime()}`}
               />
