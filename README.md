@@ -2,7 +2,7 @@
 
 A blockchain-based electronic Know Your Customer (e-KYC) system that allows secure document verification and maintains an immutable record of verified documents. The system is built with React, Node.js, MongoDB, and Ethereum Smart Contracts.
 
-Live Demo: [http://64.227.185.123/](http://64.227.185.123/)
+
 
 ## Features
 
